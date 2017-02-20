@@ -3,6 +3,8 @@
 use 5.018_000;
 use strict;
 use warnings;
+use utf8;
+use Text::Unidecode;
 
 no if $] >= 5.018, warnings => "experimental::smartmatch";
 no if $] >= 5.018, warnings => "experimental::lexical_subs";

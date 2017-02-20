@@ -3,6 +3,8 @@
 use 5.018_000;
 use strict;
 use warnings;
+use utf8;
+use Text::Unidecode;
 
 no if $] >= 5.018, warnings => "experimental::smartmatch";
 no if $] >= 5.018, warnings => "experimental::lexical_subs";
@@ -23,6 +25,9 @@ $ENV{MOJO_MAX_MESSAGE_SIZE} = '0';
 
 my %CACHE;
 
+$ua->max_connections(25);
+$ua->request_timeout(10);
+
 for my $query (@ARGV) {
 
     $ua->max_redirects(5)->get(
@@ -33,62 +38,48 @@ for my $query (@ARGV) {
             # Level 1
 
             for ($tx->res->dom->find("a")->map( attr => 'href' )->each) {
-
                 next unless $_;
 
                 $_ = normalize_links($_);
+                next if $_ eq '1';
 
                 if (not exists $CACHE{$_}) {
-
-                    next if $_ eq '1';
                     $CACHE{$_} = 0;
                     say $_;
 
                     # Level 2
 
                     for ($ua->max_redirects(5)->get($_)->res->dom->find("a")->map(attr => "href")->each) {
-
                         next unless $_;
 
                         $_ = normalize_links($_);
+                        next if $_ eq '1';
 
                         if (not exists $CACHE{$_}) {
-
-                            next if $_ eq '1';
-                            next if $_ =~ m/mailto:/g;
-                            next if $_ =~ m/javascript:/g;
                             $CACHE{$_} = 0;
                             say $_;
 
                             # Level 3
 
                             for ($ua->max_redirects(5)->get($_)->res->dom->find("a")->map(attr => "href")->each) {
-
                                 next unless $_;
 
                                 $_ = normalize_links($_);
+                                next if $_ eq '1';
 
                                 if (not exists $CACHE{$_}) {
-
-                                    next if $_ eq '1';
-                                    next if $_ =~ m/mailto:/g;
-                                    next if $_ =~ m/javascript:/g;
                                     $CACHE{$_} = 0;
                                     say $_;
 
                                     # Level 4
 
                                     for ($ua->max_redirects(5)->get($_)->res->dom->find("a")->map(attr => "href")->each) {
-
                                         next unless $_;
 
                                         $_ = normalize_links($_);
+                                        next if $_ eq '1';
 
                                         if (not exists $CACHE{$_}) {
-
-                                            next if $_ eq '1';
-                                            next if $_ =~ m/mailto:/g;
-                                            next if $_ =~ m/javascript:/g;
                                             $CACHE{$_} = 0;
                                             say $_;
 
@@ -99,12 +90,9 @@ for my $query (@ARGV) {
                                                 next unless $_;
 
                                                 $_ = normalize_links($_);
+                                                next if $_ eq '1';
 
                                                 if (not exists $CACHE{$_}) {
-
-                                                    next if $_ eq '1';
-                                                    next if $_ =~ m/mailto:/g;
-                                                    next if $_ =~ m/javascript:/g;
                                                     $CACHE{$_} = 0;
                                                     say $_;
 
@@ -115,12 +103,9 @@ for my $query (@ARGV) {
                                                         next unless $_;
 
                                                         $_ = normalize_links($_);
+                                                        next if $_ eq '1';
 
                                                         if (not exists $CACHE{$_}) {
-
-                                                            next if $_ eq '1';
-                                                            next if $_ =~ m/mailto:/g;
-                                                            next if $_ =~ m/javascript:/g;
                                                             $CACHE{$_} = 0;
                                                             say $_;
                                                         }
@@ -142,12 +127,10 @@ for my $query (@ARGV) {
 
         my $link = shift;
 
-        try {
-            $link = url_unescape $link;
-
-            my ($clean) = $link =~ m/.*(http.*)/g;
-            return $clean unless not $clean;
-        }
+        $link = url_unescape $link;
+        my ($clean) = $link =~ m/.*(http.*)/g;
+        #$clean =~ s/([^[:ascii:]]+)/unidecode($1)/ge;
+        return $clean unless not $clean;
     }
 }
 

@@ -15,7 +15,6 @@ use Mojo::Util qw/ camelize decamelize quote dumper url_escape url_unescape/;
 use Mojo::JSON qw/ decode_json encode_json /;
 use Try::Tiny;
 
-use Email::Valid::Loose;
 
 my $ua = Mojo::UserAgent->new;
 #$ua->proxy->http('socks://127.0.0.1:9050');
@@ -26,20 +25,17 @@ my %CACHE;
 
 while (<STDIN>) {
 
-    for ($ua->max_redirects(5)->get($_)->res->dom->find("a")->map(attr => "href")->each)
+    for (split /\n/, $ua->max_redirects(5)->get($_)->res->body)
     {
         next if not $_;
+        
+        m/Address: .*/ig;
 
-        if (m/mailto/g) {
-            s/mailto://g;
-
-            my $email = decamelize $_;
-
-            if (not exists $CACHE{$email}) {
-                $CACHE{$email} = 0;
-                say decamelize $_
-                    if Email::Valid::Loose->address($_);
-            }
+        $CACHE{$_}++ if exists $CACHE{$_};
+        
+        if (not exists $CACHE{$_}) {
+            $CACHE{$_} = 0;
+            say $_;
         }
     }
 }

@@ -22,6 +22,10 @@ use Email::Valid::Loose;
 my $ua = Mojo::UserAgent->new;
 #$ua->proxy->http('socks://127.0.0.1:9050');
 
+
+$ua->max_connections(25);
+$ua->request_timeout(10);
+
 $ENV{MOJO_MAX_MESSAGE_SIZE} = '0';
 
 my %CACHE;
@@ -35,12 +39,13 @@ while (<STDIN>) {
         if (m/mailto/g) {
             s/mailto://g;
 
-            my $email = decamelize $_;
+            if(exists $CACHE{$_}) {
+                $CACHE{$_}++;
+            }
 
-            if (not exists $CACHE{$email}) {
-                $CACHE{$email} = 0;
-                say decamelize $_
-                    if Email::Valid::Loose->address($_);
+            if (not exists $CACHE{$_}) {
+                $CACHE{$_} = 0;
+                say $_ if Email::Valid::Loose->address($_);
             }
         }
     }

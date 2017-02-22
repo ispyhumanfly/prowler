@@ -1,3 +1,3 @@
 #!/bin/bash
 
-cat <(./prowler-engine-google.pl $@ & ./prowler-engine-duckduckgo.pl $@ & ./prowler-engine-bing.pl $@)
+time cat <(./prowler-engine-google.pl $@ 2>/dev/null & ./prowler-engine-duckduckgo.pl $@ 2>/dev/null & ./prowler-engine-bing.pl $@ 2>/dev/null)

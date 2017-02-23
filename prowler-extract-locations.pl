@@ -29,13 +29,15 @@ while (<STDIN>) {
     {
         next if not $_;
         
-        m/Address: .*/ig;
-
-        $CACHE{$_}++ if exists $CACHE{$_};
+        if (m/Address: .*/ig) {
         
-        if (not exists $CACHE{$_}) {
-            $CACHE{$_} = 0;
-            say $_;
+        my ($location) = $_ =~ m/Address: (^\d+.*\d+)$/g;
+        
+        $CACHE{$location}++ if exists $CACHE{$location};        
+            if (not exists $CACHE{$location}) {
+                $CACHE{$location} = 0;
+                say $location;
+            }
         }
     }
 }

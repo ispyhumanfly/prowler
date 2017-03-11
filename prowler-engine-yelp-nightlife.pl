@@ -38,12 +38,11 @@ for my $query (@ARGV) {
                 my ( $ua, $tx ) = @_;
 
                 for($tx->res->dom->find('li.regular-search-result')->each) {
-                    s/^\s+|\s+$//g;
 
-                    my $restaurant = $_->at('h3 > span > a > span')->text;
+                    my $nightlife = $_->at('h3 > span > a > span')->text;
 
-                    if (not exists $CACHE{$restaurant}) {
-                        $CACHE{$restaurant} = 0;
+                    if (not exists $CACHE{$nightlife}) {
+                        $CACHE{$nightlife} = 0;
 
                         say $_->at('h3 > span > a > span')->text;
                         #say $_->at('div.biz-rating.biz-rating-large.clearfix > div')->attr('title');

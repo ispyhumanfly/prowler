@@ -38,7 +38,6 @@ for my $query (@ARGV) {
                 my ( $ua, $tx ) = @_;
 
                 for($tx->res->dom->find('li.regular-search-result')->each) {
-                    s/^\s+|\s+$//g;
 
                     my $restaurant = $_->at('h3 > span > a > span')->text;
 

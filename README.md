@@ -15,12 +15,12 @@ Or
     prowler search detroit+sports | prowler extract profiles
 
 Format the results of your search and extraction.
-
     prowler search detroit+sports | prowler extract all | prowler format csv
 Or
     prowler search detroit+sports | prowler extract all | prowler format json
 Or
     prowler search detroit+sports | prowler extract all | prowler format xml
+
 # License
 MIT
 # Copyright

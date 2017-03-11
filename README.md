@@ -2,11 +2,12 @@
 A scalable data mining and reporting toolkit for the web.
 
 ## Synopsis
-Search the world wide web for any URL that matches your query string.
+
+###Search the world wide web for any URL that matches your query string.
 
     prowler search detroit+sports
     
-Extract specific kinds of data from each page.
+###Extract specific kinds of data from each page.
 
 Emails
 
@@ -20,7 +21,7 @@ Profiles
 
     prowler search detroit+sports | prowler extract profiles
 
-Format the results of your search and extraction.
+### Format the results of your search and extraction.
 
 CSV
 

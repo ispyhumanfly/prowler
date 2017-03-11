@@ -9,6 +9,7 @@ Search the world wide web for any URL that matches your query string.
 Extract specific kinds of data from each page.
 
 Emails
+
     prowler search detroit+sports | prowler extract emails
 
 Images

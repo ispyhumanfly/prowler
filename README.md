@@ -8,25 +8,28 @@ Search the world wide web for any URL that matches your query string.
     
 Extract specific kinds of data from each page.
 
-    prowler search detroit+sports | prowler extract email
+Emails
+    prowler search detroit+sports | prowler extract emails
 
-Or
+Images
 
     prowler search detroit+sports | prowler extract images
 
-Or
+Profiles
 
     prowler search detroit+sports | prowler extract profiles
 
 Format the results of your search and extraction.
 
+CSV
+
     prowler search detroit+sports | prowler extract all | prowler format csv
 
-Or
+JSON
     
     prowler search detroit+sports | prowler extract all | prowler format json
 
-Or
+XML
 
     prowler search detroit+sports | prowler extract all | prowler format xml
 

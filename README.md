@@ -27,6 +27,7 @@ Or
     prowler search detroit+sports | prowler extract all | prowler format json
 
 Or
+
     prowler search detroit+sports | prowler extract all | prowler format xml
 
 # License

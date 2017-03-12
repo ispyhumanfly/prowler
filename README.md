@@ -1,5 +1,5 @@
 # Prowler
-Easily search the web, extract data from the results, and transform that data into a format you can use.
+Search the web, extract data from the results, and transform that data into a format you can use.
 
 ## Synopsis
 Elit eiusmod enim ex duis ex irure anim est labore aute eu id.
@@ -35,19 +35,19 @@ Ad labore pariatur sit est dolore irure ipsum excepteur qui irure cillum sit ad 
 ### Format
 Minim ad excepteur cupidatat cupidatat officia est veniam commodo proident incididunt ullamco consectetur ut labore.
 
-CSV
+####CSV
 
     prowler search kid+blogs --extract all --format csv
 
-JSON
+####JSON
 
     prowler search kid+blogs --extract all --format json
 
-XML
+####XML
 
     prowler search kid+blogs --extract all --format xml
 
-YAML
+####YAML
 
     prowler search kid+blogs --extract all --format yaml
 

@@ -37,15 +37,19 @@ Minim ad excepteur cupidatat cupidatat officia est veniam commodo proident incid
 
 CSV
 
-    prowler search detroit+sports | prowler extract all | prowler format csv
+    prowler search kid+blogs --extract all --format csv
 
 JSON
 
-    prowler search detroit+sports | prowler extract all | prowler format json
+    prowler search kid+blogs --extract all --format json
 
 XML
 
-    prowler search detroit+sports | prowler extract all | prowler format xml
+    prowler search kid+blogs --extract all --format xml
+
+YAML
+
+    prowler search kid+blogs --extract all --format yaml
 
 # Author
 Dan Stephenson (ispyhumanfly)

@@ -1,40 +1,54 @@
 # Prowler
-A scalable data mining and reporting toolkit for the web.
+Easily search the web, extract data from the results, and transform that data into a format you can use.
 
 ## Synopsis
+Elit eiusmod enim ex duis ex irure anim est labore aute eu id.
 
-###Search the world wide web for any URL that matches your query string.
+###Search
+Non deserunt excepteur ut laborum consectetur voluptate exercitation ut dolor.
 
     prowler search detroit+sports
-    
-###Extract specific kinds of data from each page.
+
+###Extract
+Anim cupidatat adipisicing quis est Lorem sunt occaecat incididunt deserunt nisi est.
 
 Emails
+Elit ipsum excepteur incididunt sunt aliquip fugiat sit culpa labore.
 
-    prowler search detroit+sports | prowler extract emails
+    prowler search kid+blogs --extract emails
 
 Images
+Ut ex incididunt sint aliquip deserunt culpa esse sint quis.
 
-    prowler search detroit+sports | prowler extract images
+    prowler search kid+blogs --extract images
 
 Profiles
+Do irure tempor amet nulla aliqua ullamco.
 
-    prowler search detroit+sports | prowler extract profiles
+    prowler search kid+blogs --extract profiles
 
-### Format the results of your search and extraction.
+Locations
+Ad labore pariatur sit est dolore irure ipsum excepteur qui irure cillum sit ad consectetur.
+
+    prowler search kid+blogs --extract locations
+
+### Format
+Minim ad excepteur cupidatat cupidatat officia est veniam commodo proident incididunt ullamco consectetur ut labore.
 
 CSV
 
     prowler search detroit+sports | prowler extract all | prowler format csv
 
 JSON
-    
+
     prowler search detroit+sports | prowler extract all | prowler format json
 
 XML
 
     prowler search detroit+sports | prowler extract all | prowler format xml
 
+# Author
+Dan Stephenson (ispyhumanfly)
 # License
 MIT
 # Copyright

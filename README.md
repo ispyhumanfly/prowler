@@ -12,22 +12,22 @@ Non deserunt excepteur ut laborum consectetur voluptate exercitation ut dolor.
 ###Extract
 Anim cupidatat adipisicing quis est Lorem sunt occaecat incididunt deserunt nisi est.
 
-Emails
+###Emails
 Elit ipsum excepteur incididunt sunt aliquip fugiat sit culpa labore.
 
     prowler search kid+blogs --extract emails
 
-Images
+###Images
 Ut ex incididunt sint aliquip deserunt culpa esse sint quis.
 
     prowler search kid+blogs --extract images
 
-Profiles
+###Profiles
 Do irure tempor amet nulla aliqua ullamco.
 
     prowler search kid+blogs --extract profiles
 
-Locations
+###Locations
 Ad labore pariatur sit est dolore irure ipsum excepteur qui irure cillum sit ad consectetur.
 
     prowler search kid+blogs --extract locations

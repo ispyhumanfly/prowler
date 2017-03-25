@@ -19,8 +19,6 @@ use Try::Tiny;
 
 my $ua = Mojo::UserAgent->new;
 
-#$ua->proxy->http('socks://127.0.0.1:9050');
-
 $ENV{MOJO_MAX_MESSAGE_SIZE} = '0';
 
 my %CACHE;
@@ -30,22 +28,23 @@ $ua->request_timeout(10);
 
 for my $symbol (@ARGV) {
 
-    $ua->max_redirects(1)->get(
-        "http://www.nasdaq.com/symbol/$symbol/real-time" => sub {
+        #$ua->proxy->http('socks://localhost:9050')->https('socks://localhost:9050');
 
-            my ( $ua, $tx ) = @_;
+        $ua->max_redirects(1)->get(
+            "http://www.nasdaq.com/symbol/$symbol/real-time" => sub {
 
-            $symbol = uc $symbol;
+                my ( $ua, $tx ) = @_;
 
-            my $lastsale = $tx->res->dom->at("#qwidget_lastsale")->text;
-            my $netchange = $tx->res->dom->at("#qwidget_netchange")->text;
-            my $percent = $tx->res->dom->at("#qwidget_percent")->text;
+                $symbol = uc $symbol;
 
-            say "STOCK: $symbol, LAST_SALE: $lastsale, NC: $netchange, %: $percent";
+                my $lastsale = $tx->res->dom->at("#qwidget_lastsale")->text;
+                my $netchange = $tx->res->dom->at("#qwidget_netchange")->text;
+                my $percent = $tx->res->dom->at("#qwidget_percent")->text;
 
 
-        }
-    );
+                say "STOCK: $symbol, LAST_SALE: $lastsale, NC: $netchange, %: $percent";
+            }
+        );
 }
 
 Mojo::IOLoop->start unless Mojo::IOLoop->is_running;

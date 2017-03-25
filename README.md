@@ -46,7 +46,7 @@ Minim ad excepteur cupidatat cupidatat officia est veniam commodo proident incid
 
     prowler kid+blogs --extract all --format json
 
-####XML
+#### XML
 
     prowler kid+blogs --extract all --format xml
 

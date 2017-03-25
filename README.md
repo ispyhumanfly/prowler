@@ -7,30 +7,30 @@ Enim Lorem fugiat in cillum nulla adipisicing incididunt in exercitation incidid
 ## Usage
 Elit eiusmod enim ex duis ex irure anim est labore aute eu id.
 
-###Search
+### Search
 Non deserunt excepteur ut laborum consectetur voluptate exercitation ut dolor.
 
     prowler detroit+sports
 
-###Extract
+### Extract
 Anim cupidatat adipisicing quis est Lorem sunt occaecat incididunt deserunt nisi est.
 
-###Emails
+### Emails
 Elit ipsum excepteur incididunt sunt aliquip fugiat sit culpa labore.
 
     prowler kid+blogs --extract emails
 
-###Images
+### Images
 Ut ex incididunt sint aliquip deserunt culpa esse sint quis.
 
     prowler kid+blogs --extract images
 
-###Profiles
+### Profiles
 Do irure tempor amet nulla aliqua ullamco.
 
     prowler kid+blogs --extract profiles
 
-###Locations
+### Locations
 Ad labore pariatur sit est dolore irure ipsum excepteur qui irure cillum sit ad consectetur.
 
     prowler kid+blogs --extract locations
@@ -38,11 +38,11 @@ Ad labore pariatur sit est dolore irure ipsum excepteur qui irure cillum sit ad 
 ### Format
 Minim ad excepteur cupidatat cupidatat officia est veniam commodo proident incididunt ullamco consectetur ut labore.
 
-####CSV
+#### CSV
 
     prowler search kid+blogs --extract all --format csv
 
-####JSON
+#### JSON
 
     prowler kid+blogs --extract all --format json
 
@@ -50,7 +50,7 @@ Minim ad excepteur cupidatat cupidatat officia est veniam commodo proident incid
 
     prowler kid+blogs --extract all --format xml
 
-####YAML
+#### YAML
 
     prowler kid+blogs --extract all --format yaml
 

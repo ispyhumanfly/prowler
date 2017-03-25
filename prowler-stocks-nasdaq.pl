@@ -28,12 +28,12 @@ $ua->request_timeout(10);
 
 for my $symbol (@ARGV) {
 
-        #$ua->proxy->http('socks://localhost:9050')->https('socks://localhost:9050');
-
         $ua->max_redirects(1)->get(
             "http://www.nasdaq.com/symbol/$symbol/real-time" => sub {
 
                 my ( $ua, $tx ) = @_;
+
+                $ua->proxy->http('socks://127.0.0.1:9050')->https('socks://127.0.0.1:9050');
 
                 $symbol = uc $symbol;
 

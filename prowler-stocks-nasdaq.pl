@@ -18,6 +18,8 @@ use Mojo::JSON qw/ decode_json encode_json /;
 use Try::Tiny;
 use DateTime;
 
+use Term::ANSIColor;
+
 my $ua = Mojo::UserAgent->new;
 
 $ENV{MOJO_MAX_MESSAGE_SIZE} = '0';
@@ -27,13 +29,13 @@ my %CACHE;
 $ua->max_connections(25);
 $ua->request_timeout(10);
 
-my $proxy = Mojo::UserAgent::Proxy->new;
-$proxy->http('socks://127.0.0.1:9050')->https('socks://127.0.0.1:9050');
-
-Mojo::IOLoop->recurring(5 => sub {
+Mojo::IOLoop->recurring(10 => sub {
     my $loop = shift;
 
     for my $symbol (@ARGV) {
+
+        my $proxy = Mojo::UserAgent::Proxy->new;
+        $proxy->http('socks://127.0.0.1:9050')->https('socks://127.0.0.1:9050');
 
         $ua->max_redirects(1)->get(
             "http://www.nasdaq.com/symbol/$symbol/real-time" => sub {
@@ -45,21 +47,28 @@ Mojo::IOLoop->recurring(5 => sub {
 
                 my $arrow;
                 if ($tx->res->dom->at("#qwidget-arrow > div[class~=arrow-green]")) {
-                    $arrow = "Up";
+                    print color 'bold green';
+                    $arrow = 'Up';
                 }
                 if ($tx->res->dom->at("#qwidget-arrow > div[class~=arrow-red]")) {
-                    $arrow = "Down";
+                    print color 'bold red';
+                    $arrow = 'Down';
                 }
 
                 my $lastsale = $tx->res->dom->at("#qwidget_lastsale")->text;
                 my $netchange = $tx->res->dom->at("#qwidget_netchange")->text;
                 my $percent = $tx->res->dom->at("#qwidget_percent")->text;
 
-                printf ("TIME: %-19s SYMBOL: %-6s ARROW: %-5s LAST_SALE: %-8s NET_CHANGE: %-5s PERCENT: %-5s\n",
-                    $timestamp, $symbol, $arrow, $lastsale, $netchange, $percent);
+                unless (exists $CACHE{$symbol} and $CACHE{$symbol} == int($netchange)) {
+                    printf "TIME: %-19s SYMBOL: %-6s ARROW: %-5s LAST_SALE: %-8s NET_CHANGE: %-5s PERCENT: %-5s\n",
+                        $timestamp, $symbol, $arrow, $lastsale, $netchange, $percent;
+                    print color 'reset';
+                }
+                $CACHE{"$symbol"} = int($netchange);
             }
         );
     }
 });
 
 Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+print color 'reset';

@@ -50,9 +50,13 @@ Mojo::IOLoop->recurring(10 => sub {
                     print color 'bold green';
                     $arrow = 'Up';
                 }
-                if ($tx->res->dom->at("#qwidget-arrow > div[class~=arrow-red]")) {
+                elsif ($tx->res->dom->at("#qwidget-arrow > div[class~=arrow-red]")) {
                     print color 'bold red';
                     $arrow = 'Down';
+                }
+                else {
+                    print color 'reset';
+                    $arrow = '--';
                 }
 
                 my $lastsale = $tx->res->dom->at("#qwidget_lastsale")->text;
@@ -60,8 +64,8 @@ Mojo::IOLoop->recurring(10 => sub {
                 my $percent = $tx->res->dom->at("#qwidget_percent")->text;
 
                 unless (exists $CACHE{$symbol} and $CACHE{$symbol} == int($netchange)) {
-                    printf "TIME: %-19s SYMBOL: %-6s ARROW: %-5s LAST_SALE: %-8s NET_CHANGE: %-5s PERCENT: %-5s\n",
-                        $timestamp, $symbol, $arrow, $lastsale, $netchange, $percent;
+                    printf "%-6s TIME: %-19s ARROW: %-5s LAST_SALE: %-8s NET_CHANGE: %-8s PERCENT: %-5s\n",
+                        $symbol, $timestamp, $arrow, $lastsale, $netchange, $percent;
                     print color 'reset';
                 }
                 $CACHE{"$symbol"} = int($netchange);
@@ -71,4 +75,3 @@ Mojo::IOLoop->recurring(10 => sub {
 });
 
 Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
-print color 'reset';

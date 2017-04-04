@@ -32,10 +32,10 @@ $ua->request_timeout(10);
 Mojo::IOLoop->recurring(10 => sub {
     my $loop = shift;
 
-    for my $symbol (@ARGV) {
+    my $proxy = Mojo::UserAgent::Proxy->new;
+    $proxy->http('socks://127.0.0.1:9050')->https('socks://127.0.0.1:9050');
 
-        my $proxy = Mojo::UserAgent::Proxy->new;
-        $proxy->http('socks://127.0.0.1:9050')->https('socks://127.0.0.1:9050');
+    for my $symbol (@ARGV) {
 
         $ua->max_redirects(1)->get(
             "http://www.nasdaq.com/symbol/$symbol/real-time" => sub {
@@ -63,12 +63,12 @@ Mojo::IOLoop->recurring(10 => sub {
                 my $netchange = $tx->res->dom->at("#qwidget_netchange")->text;
                 my $percent = $tx->res->dom->at("#qwidget_percent")->text;
 
-                unless (exists $CACHE{$symbol} and $CACHE{$symbol} == int($netchange)) {
+                unless (exists $CACHE{$symbol} and $CACHE{$symbol} eq $netchange) {
                     printf "%-6s TIME: %-19s ARROW: %-5s LAST_SALE: %-8s NET_CHANGE: %-8s PERCENT: %-5s\n",
                         $symbol, $timestamp, $arrow, $lastsale, $netchange, $percent;
                     print color 'reset';
                 }
-                $CACHE{"$symbol"} = int($netchange);
+                $CACHE{"$symbol"} = $netchange;
             }
         );
     }

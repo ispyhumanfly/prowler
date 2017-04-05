@@ -26,16 +26,18 @@ $ENV{MOJO_MAX_MESSAGE_SIZE} = '0';
 
 my %CACHE;
 
+my $proxy = Mojo::UserAgent::Proxy->new;
+$proxy->detect;
+
 $ua->max_connections(25);
 $ua->request_timeout(10);
 
 Mojo::IOLoop->recurring(10 => sub {
     my $loop = shift;
 
-    my $proxy = Mojo::UserAgent::Proxy->new;
-    $proxy->http('socks://127.0.0.1:9050')->https('socks://127.0.0.1:9050');
-
     for my $symbol (@ARGV) {
+
+        $symbol = lc $symbol;
 
         $ua->max_redirects(1)->get(
             "http://www.nasdaq.com/symbol/$symbol/real-time" => sub {
@@ -53,10 +55,6 @@ Mojo::IOLoop->recurring(10 => sub {
                 elsif ($tx->res->dom->at("#qwidget-arrow > div[class~=arrow-red]")) {
                     print color 'bold red';
                     $arrow = 'Down';
-                }
-                else {
-                    print color 'reset';
-                    $arrow = '--';
                 }
 
                 my $lastsale = $tx->res->dom->at("#qwidget_lastsale")->text;

@@ -32,7 +32,7 @@ $proxy->detect;
 $ua->max_connections(25);
 $ua->request_timeout(10);
 
-Mojo::IOLoop->recurring(5 => sub {
+Mojo::IOLoop->recurring(10 => sub {
     my $loop = shift;
 
     for my $symbol (@ARGV) {
@@ -54,16 +54,23 @@ Mojo::IOLoop->recurring(5 => sub {
 
                         my ( $ua, $tx ) = @_;
 
-                        my $lastsale = $tx->res->json->{result}->{'LastPrice'};
-                        my $netchange = $tx->res->json->{result}->{'Change'};
+                        my $timestamp = DateTime->now;
+
+                        my $change = $tx->res->json->{result}->{'Change'};
+
+                        print color 'bold red' if ($change =~ m/^\-/g);
+                        print color 'bold green' if ($change =~ m/^\d+/g);
+
+                        my $last_price = $tx->res->json->{result}->{'LastPrice'};
+                        #my $netchange = $tx->res->json->{result}->{'Change'};
                         #my $lastsale = $tx->res->json->{result}->{'LastPrice'};
 
-                        unless (exists $CACHE{$symbol} and $CACHE{$symbol} eq $netchange) {
-                            printf "%-6s TIME: %-19s ARROW: %-5s LAST_SALE: %-8s NET_CHANGE: %-8s PERCENT: %-5s\n",
-                                $symbol, '--', '--', $lastsale, $netchange, '--';
+                        unless (exists $CACHE{$symbol} and $CACHE{$symbol} eq $change) {
+                            printf "%-6s TIME: %-19s LAST_PRICE: %-15s CHANGE: %-8s\n",
+                                $symbol, $timestamp, $last_price, $change;
                             print color 'reset';
                         }
-                        $CACHE{"$symbol"} = $netchange;
+                        $CACHE{"$symbol"} = $change;
                     })
                 }
                 #my $arrow;

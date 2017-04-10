@@ -57,35 +57,19 @@ Mojo::IOLoop->recurring(10 => sub {
                         my $timestamp = DateTime->now;
 
                         my $change = $tx->res->json->{result}->{'Change'};
+                        my $last_price = $tx->res->json->{result}->{'LastPrice'};
 
                         print color 'bold red' if ($change =~ m/^\-/g);
                         print color 'bold green' if ($change =~ m/^\d+/g);
 
-                        my $last_price = $tx->res->json->{result}->{'LastPrice'};
-                        #my $netchange = $tx->res->json->{result}->{'Change'};
-                        #my $lastsale = $tx->res->json->{result}->{'LastPrice'};
-
-                        unless (exists $CACHE{$symbol} and $CACHE{$symbol} eq $change) {
-                            printf "%-6s TIME: %-19s LAST_PRICE: %-15s CHANGE: %-8s\n",
-                                $symbol, $timestamp, $last_price, $change;
+                        unless (exists $CACHE{$symbol} and $CACHE{$symbol} eq $last_price) {
+                            printf "%-6s TIME: %-19s CHANGE: %-8s LAST_PRICE: %-16s\n",
+                                $symbol, $timestamp, "$change%", $last_price;
                             print color 'reset';
                         }
-                        $CACHE{"$symbol"} = $change;
+                        $CACHE{"$symbol"} = $last_price;
                     })
                 }
-                #my $arrow;
-                #if ($tx->res->dom->at("#qwidget-arrow > div[class~=arrow-green]")) {
-                #    print color 'bold green';
-                #    $arrow = 'Up';
-                #}
-                #elsif ($tx->res->dom->at("#qwidget-arrow > div[class~=arrow-red]")) {
-                #    print color 'bold red';
-                #    $arrow = 'Down';
-                #}
-
-                #my $lastsale = $tx->res->dom->at("#qwidget_lastsale")->text;
-                #my $netchange = $tx->res->dom->at("#qwidget_netchange")->text;
-                #my $percent = $tx->res->dom->at("#qwidget_percent")->text;
             }
         );
     }

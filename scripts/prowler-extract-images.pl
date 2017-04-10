@@ -20,7 +20,7 @@ use Try::Tiny;
 use Email::Valid::Loose;
 
 my $ua = Mojo::UserAgent->new;
-#$ua->proxy->http('socks://127.0.0.1:9050');
+# $ua->proxy->http('socks://127.0.0.1:9050');
 
 $ENV{MOJO_MAX_MESSAGE_SIZE} = '0';
 
@@ -54,7 +54,7 @@ while (<STDIN>) {
 sub normalize_images {
 
     my $image = shift;
-    ($image) = $image =~ m/.*(http.*)/g;
+    ($image) = $image =~ m/^(http.*)/g;
 
     $image = url_unescape $image;
     return $image unless not $image;

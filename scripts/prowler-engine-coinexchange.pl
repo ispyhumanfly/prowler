@@ -32,7 +32,7 @@ $proxy->detect;
 $ua->max_connections(25);
 $ua->request_timeout(10);
 
-Mojo::IOLoop->recurring(10 => sub {
+Mojo::IOLoop->recurring(int(rand(15)) => sub {
     my $loop = shift;
 
     for my $symbol (@ARGV) {

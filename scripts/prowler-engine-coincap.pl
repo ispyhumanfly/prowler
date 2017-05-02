@@ -35,17 +35,17 @@ $ua->request_timeout(10);
 Mojo::IOLoop->recurring(int(rand(15)) => sub {
     my $loop = shift;
 
-    for my $coin (@ARGV) {
+    for my $symbol (@ARGV) {
 
         $ua->max_redirects(1)->get(
             "http://coincap.io/front" => sub {
 
                 my ( $ua, $tx ) = @_;
 
-                $coin = uc $coin;
+                $symbol = uc $symbol;
 
                 for (@{$tx->res->json}) {
-                    next if $_->{"short"} ne $coin;
+                    next if $_->{"short"} ne $symbol;
 
                     my $timestamp = DateTime->now;
 
@@ -55,12 +55,12 @@ Mojo::IOLoop->recurring(int(rand(15)) => sub {
                     print color 'bold red' if ($change =~ m/^\-/g);
                     print color 'bold green' if ($change =~ m/^\d+/g);
 
-                    unless (exists $CACHE{$coin} and $CACHE{$coin} eq $price) {
+                    unless (exists $CACHE{$symbol} and $CACHE{$symbol} eq $price) {
                         printf "%-6s TIME: %-19s CHANGE: %-8s PRICE: %-16s\n",
-                            $coin, $timestamp, "$change%", $price;
+                            $symbol, $timestamp, "$change%", $price;
                         print color 'reset';
                     }
-                    $CACHE{"$coin"} = $price;
+                    $CACHE{"$symbol"} = $price;
                 }
             }
         );

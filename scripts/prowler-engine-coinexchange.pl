@@ -48,6 +48,8 @@ Mojo::IOLoop->recurring(int(rand(15)) => sub {
                 for (@{$markets->{result}}) {
                     next if $_->{"MarketAssetCode"} ne $symbol;
 
+                    my $market = $_->{"MarketAssetName"};
+
                     my $id = $_->{"MarketID"};
 
                     $ua->get("https://www.coinexchange.io/api/v1/getmarketsummary?market_id=$id" => sub {
@@ -57,17 +59,17 @@ Mojo::IOLoop->recurring(int(rand(15)) => sub {
                         my $timestamp = DateTime->now;
 
                         my $change = $tx->res->json->{result}->{'Change'};
-                        my $last_price = $tx->res->json->{result}->{'LastPrice'};
+                        my $price = $tx->res->json->{result}->{'LastPrice'};
 
                         print color 'bold red' if ($change =~ m/^\-/g);
                         print color 'bold green' if ($change =~ m/^\d+/g);
 
-                        unless (exists $CACHE{$symbol} and $CACHE{$symbol} eq $last_price) {
-                            printf "%-6s TIME: %-19s CHANGE: %-8s LAST_PRICE: %-16s\n",
-                                $symbol, $timestamp, "$change%", $last_price;
+                        unless (exists $CACHE{$symbol} and $CACHE{$symbol} eq $price) {
+                            printf "%-6s TIME: %-19s MARKET: %-8s CHANGE: %-8s PRICE: %-16s\n",
+                                $symbol, $timestamp, $market, "$change%", $price;
                             print color 'reset';
                         }
-                        $CACHE{"$symbol"} = $last_price;
+                        $CACHE{"$symbol"} = $price;
                     })
                 }
             }

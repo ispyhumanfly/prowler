@@ -38,30 +38,23 @@ Mojo::IOLoop->recurring(int(rand(5)) => sub {
     for my $symbol (@ARGV) {
 
         $ua->max_redirects(1)->get(
-            "http://coincap.io/front" => sub {
+            "https://api.lionshare.capital/api/prices" => sub {
 
                 my ( $ua, $tx ) = @_;
 
                 $symbol = uc $symbol;
 
-                for (@{$tx->res->json}) {
-                    next if $_->{"short"} ne $symbol;
+                my $timestamp = DateTime->now;
+                my $price = $tx->res->json->{data}->{$symbol}[11];
 
-                    my $timestamp = DateTime->now;
+                print color 'bold blue';
 
-                    my $change = $_->{'cap24hrChange'};
-                    my $price = $_->{'price'};
-
-                    print color 'bold red' if ($change =~ m/^\-/g);
-                    print color 'bold green' if ($change =~ m/^\d+/g);
-
-                    unless (exists $CACHE{$symbol} and $CACHE{$symbol} eq $price) {
-                        printf "%-6s TIME: %-19s CHANGE: %-8s PRICE: %-16s\n",
-                            $symbol, $timestamp, "$change%", $price;
-                        print color 'reset';
-                    }
-                    $CACHE{"$symbol"} = $price;
+                unless (exists $CACHE{$symbol} and $CACHE{$symbol} eq $price) {
+                    printf "%-6s TIME: %-19s PRICE: %-16s\n",
+                        $symbol, $timestamp, $price;
+                    print color 'reset';
                 }
+                $CACHE{"$symbol"} = $price;
             }
         );
     }

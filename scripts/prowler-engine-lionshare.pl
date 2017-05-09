@@ -45,15 +45,7 @@ Mojo::IOLoop->recurring(int(rand(5)) => sub {
                 $symbol = uc $symbol;
 
                 my $timestamp = DateTime->now;
-                my $price;
-
-                # Poloniex
-                $price = $tx->res->json->{data}->{$symbol}[11]
-                    if $tx->res->json->{data}->{$symbol}[11];
-
-                # GDAX
-                $price = $tx->res->json->{data}->{$symbol}[12]
-                    if $tx->res->json->{data}->{$symbol}[12];
+                my $price = pop @{$tx->res->json->{data}->{$symbol}};
 
                 print color 'bold blue';
 

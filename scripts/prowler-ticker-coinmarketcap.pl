@@ -13,46 +13,40 @@ use Mojo::UserAgent;
 use Mojo::UserAgent::Proxy;
 use Mojo::IOLoop;
 
-use Mojo::Util qw/ camelize decamelize quote dumper url_escape url_unescape/;
+use Mojo::Util qw/ md5_sum/;
 use Mojo::JSON qw/ decode_json encode_json /;
 use Try::Tiny;
 use DateTime;
 
 use Term::ANSIColor;
 
-my $ua = Mojo::UserAgent->new;
-
 $ENV{MOJO_MAX_MESSAGE_SIZE} = '0';
 
-my %CACHE;
-
+my $ua = Mojo::UserAgent->new;
 my $proxy = Mojo::UserAgent::Proxy->new;
 $proxy->detect;
 
-$ua->max_connections(25);
-$ua->request_timeout(10);
+my %CACHE;
 
-Mojo::IOLoop->recurring(int(rand(30)) => sub {
+Mojo::IOLoop->recurring(rand(scalar @ARGV) => sub {
     my $loop = shift;
 
-    for my $symbol (@ARGV) {
-
-        $symbol = lc $symbol;
+    for my (@ARGV) {
 
         $ua->max_redirects(1)->get(
-            "https://coinmarketcap.com/all/views/all/#BTC" => sub {
+            "https://coinmarketcap.com/all/views/all/#USD" => sub {
 
                 my ( $ua, $tx ) = @_;
 
-                $symbol = uc $symbol;
+                my $symbol = uc $_;
 
                 for ($tx->res->dom->find("table > tbody > tr")->each)
                 {
                     if ($_->at("td.text-left")) {
-                        next if $_->at("td.text-left")->text ne $symbol;
+                        next if $symbol ne $_->at("td.text-left")->text;
                     }
 
-                    eval {
+                    try {
 
                         my $price = $_->at("td:nth-child(5) > a")->text;
                         my $volume = $_->at("td:nth-child(7) > a")->text;
@@ -61,15 +55,18 @@ Mojo::IOLoop->recurring(int(rand(30)) => sub {
                         my $supply = $_->at("td:nth-child(6) > a")->text;
                         $supply =~ s/^\s+|\s+$//g;
 
-                        my $timestamp = DateTime->now;
+                        my $checksum = md5_sum "$symbol$price$marketcap$volume$supply";
 
-                        unless (exists $CACHE{$symbol} and $CACHE{$symbol} eq $price) {
+                        unless (exists $CACHE{$symbol} and $CACHE{$symbol} eq $checksum) {
+
+                            my $timestamp = DateTime->now;
+
                             printf "%-6s TIME: %-10s PRICE: %-9s MARKETCAP: %-15s VOLUME: %-14s SUPPLY: %-14s\n",
                                 $symbol, $timestamp, $price, $marketcap, $volume, $supply;
                             print color 'reset';
                         }
-                        $CACHE{"$symbol"} = $price;
-                    };
+                        $CACHE{"$symbol"} = $checksum;
+                    }
                 }
             }
         );

@@ -13,31 +13,27 @@ use Mojo::UserAgent;
 use Mojo::UserAgent::Proxy;
 use Mojo::IOLoop;
 
-use Mojo::Util qw/ camelize decamelize quote dumper url_escape url_unescape/;
+use Mojo::Util qw/ md5_sum /;
 use Mojo::JSON qw/ decode_json encode_json /;
 use Try::Tiny;
 use DateTime;
 
 use Term::ANSIColor;
 
-my $ua = Mojo::UserAgent->new;
-
 $ENV{MOJO_MAX_MESSAGE_SIZE} = '0';
 
-my %CACHE;
-
+my $ua = Mojo::UserAgent->new;
 my $proxy = Mojo::UserAgent::Proxy->new;
 $proxy->detect;
 
-$ua->max_connections(25);
-$ua->request_timeout(10);
+my %CACHE;
 
-Mojo::IOLoop->recurring(int(rand(15)) => sub {
+Mojo::IOLoop->recurring(int(rand(scalar @ARGV)) => sub {
     my $loop = shift;
 
-    for my $symbol (@ARGV) {
+    for (@ARGV) {
 
-        $symbol = lc $symbol;
+        my $symbol = lc $_;
 
         $ua->max_redirects(1)->get(
             "https://api.bitfinex.com/v1/pubticker/$symbol" => sub {
@@ -46,24 +42,23 @@ Mojo::IOLoop->recurring(int(rand(15)) => sub {
 
                 $symbol = uc $symbol;
 
-                #for (@{$tx->res->json}) {
-                    #next if $_->{"short"} ne $symbol;
+                try {
 
-                    my $timestamp = DateTime->now;
-
-                    my $volume = $tx->res->json->{'volume'};
                     my $price = $tx->res->json->{'last_price'};
+                    my $volume = $tx->res->json->{'volume'};
 
-                    #print color 'bold red' if ($change =~ m/^\-/g);
-                    #print color 'bold green' if ($change =~ m/^\d+/g);
+                    my $checksum = md5_sum "$symbol$price$volume";
 
-                    unless (exists $CACHE{$symbol} and $CACHE{$symbol} eq $price) {
+                    unless (exists $CACHE{$symbol} and $CACHE{$symbol} eq $checksum) {
+
+                        my $timestamp = DateTime->now;
+
                         printf "%-6s TIME: %-19s VOLUME: %-19s PRICE: %-16s\n",
                             $symbol, $timestamp, "$volume", $price;
                         print color 'reset';
                     }
-                    $CACHE{"$symbol"} = $price;
-                #}
+                    $CACHE{"$symbol"} = $checksum;
+                }
             }
         );
     }

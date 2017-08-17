@@ -32,29 +32,36 @@ $proxy->detect;
 $ua->max_connections(25);
 $ua->request_timeout(10);
 
-Mojo::IOLoop->recurring(int(rand(15)) => sub {
+Mojo::IOLoop->recurring(int(rand(scalar @ARGV)) => sub {
     my $loop = shift;
 
     for my $symbol (@ARGV) {
 
         $ua->max_redirects(1)->get(
-            "https://api.lionshare.capital/api/prices" => sub {
+            "http://coincap.io/front" => sub {
 
                 my ( $ua, $tx ) = @_;
 
                 $symbol = uc $symbol;
 
-                my $timestamp = DateTime->now;
-                my $price = pop @{$tx->res->json->{data}->{$symbol}};
+                for (@{$tx->res->json}) {
+                    next if $_->{"short"} ne $symbol;
 
-                print color 'bold blue';
+                    my $timestamp = DateTime->now;
 
-                unless (exists $CACHE{$symbol} and $CACHE{$symbol} eq $price) {
-                    printf "%-6s TIME: %-19s PRICE: %-16s\n",
-                        $symbol, $timestamp, $price;
-                    print color 'reset';
+                    my $change = $_->{'cap24hrChange'};
+                    my $price = $_->{'price'};
+
+                    print color 'bold red' if ($change =~ m/^\-/g);
+                    print color 'bold green' if ($change =~ m/^\d+/g);
+
+                    unless (exists $CACHE{$symbol} and $CACHE{$symbol} eq $price) {
+                        printf "%-6s TIME: %-19s CHANGE: %-8s PRICE: %-16s\n",
+                            $symbol, $timestamp, "$change%", $price;
+                        print color 'reset';
+                    }
+                    $CACHE{"$symbol"} = $price;
                 }
-                $CACHE{"$symbol"} = $price;
             }
         );
     }

@@ -1,5 +1,5 @@
 # Prowler
-Search the web, extract data from the results, and transform that data into a format you can use.
+Search the web, extract data from the results, transform the data into a format you can use, store your formatted data in a database for later analysis.
 
 ## Introduction
 Enim Lorem fugiat in cillum nulla adipisicing incididunt in exercitation incididunt ullamco sint occaecat. Sunt ex dolor voluptate esse id officia quis. Aute sunt quis pariatur consectetur aliquip aliqua et pariatur do esse eu. Tempor officia ut nisi laboris velit id commodo magna aliquip veniam adipisicing aliquip occaecat sit.

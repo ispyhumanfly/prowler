@@ -28,8 +28,8 @@ $proxy->detect;
 
 my %CACHE;
 
-Mojo::IOLoop->recurring(int(rand(scalar @ARGV)) => sub {
-    my $loop = shift;
+#Mojo::IOLoop->recurring(int(rand(scalar @ARGV)) => sub {
+    #my $loop = shift;
 
     for (@ARGV) {
 
@@ -53,7 +53,7 @@ Mojo::IOLoop->recurring(int(rand(scalar @ARGV)) => sub {
 
                         my $timestamp = DateTime->now;
 
-                        printf "%-6s TIME: %-19s VOLUME: %-19s PRICE: %-16s\n",
+                        printf "%-6s TIME: %-19s PRICE: %-18s VOLUME: %-19s\n",
                             $symbol, $timestamp, "$volume", $price;
                         print color 'reset';
                     }
@@ -62,6 +62,6 @@ Mojo::IOLoop->recurring(int(rand(scalar @ARGV)) => sub {
             }
         );
     }
-});
+#});
 
 Mojo::IOLoop->start unless Mojo::IOLoop->is_running;

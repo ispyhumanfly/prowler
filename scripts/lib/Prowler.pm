@@ -6,7 +6,7 @@ use warnings;
 
 BEGIN {
 
-    die "You must set the PROWLER_ROOT variable before instantiating Context.pm"
+    die "You must set the PROWLER_ROOT variable before instantiating Prowler.pm"
       unless exists $ENV{PROWLER_ROOT};
 }
 
@@ -15,7 +15,6 @@ chdir $ROOT;
 
 use Perl6::Attributes;
 use Data::Dumper;
-use File::Temp;
 
 use Moo;
 use namespace::clean;
@@ -56,78 +55,12 @@ sub create {
     return $output;
 }
 
-sub update {
-
-    my $self = shift;
-    my $params = shift || '';
-
-    my $command = "$ROOT/bin/opupdate $params";
-    my $output  = `$command`;
-    $output =~ s/\n//g;
-    return $output;
-}
-
-sub destroy {
+sub delete {
 
     my $self = shift;
     my $params = shift || '';
 
     my $command = "$ROOT/bin/opdestroy $params";
-    my $output  = `$command`;
-    $output =~ s/\n//g;
-    return $output;
-}
-
-sub report {
-
-    my $self = shift;
-    my $params = shift || '';
-
-    my $command = "$ROOT/bin/opreport";
-    my $output  = `$command`;
-    $output =~ s/\n//g;
-    return $output;
-}
-
-sub move {
-
-    my $self = shift;
-    my $params = shift || '';
-
-    my $command = "$ROOT/bin/opmove";
-    my $output  = `$command`;
-    $output =~ s/\n//g;
-    return $output;
-}
-
-sub copy {
-
-    my $self = shift;
-    my $params = shift || '';
-
-    my $command = "$ROOT/bin/opcopy";
-    my $output  = `$command`;
-    $output =~ s/\n//g;
-    return $output;
-}
-
-sub start {
-
-    my $self = shift;
-    my $params = shift || '';
-
-    my $command = "$ROOT/bin/opstart";
-    my $output  = `$command`;
-    $output =~ s/\n//g;
-    return $output;
-}
-
-sub stop {
-
-    my $self = shift;
-    my $params = shift || '';
-
-    my $command = "$ROOT/bin/opstop";
     my $output  = `$command`;
     $output =~ s/\n//g;
     return $output;

@@ -1,5 +1,10 @@
 #!/usr/bin/env perl
 
+BEGIN {
+
+    $ENV{MOJO_MAX_MESSAGE_SIZE} = '0';
+};
+
 use 5.018_000;
 use strict;
 use warnings;
@@ -13,14 +18,12 @@ use Mojo::UserAgent;
 use Mojo::UserAgent::Proxy;
 use Mojo::IOLoop;
 
-use Mojo::Util qw/ md5_sum/;
+use Mojo::Util qw/ md5_sum /;
 use Mojo::JSON qw/ decode_json encode_json /;
 use Try::Tiny;
 use DateTime;
 
 use Term::ANSIColor;
-
-$ENV{MOJO_MAX_MESSAGE_SIZE} = '0';
 
 my $ua = Mojo::UserAgent->new;
 my $proxy = Mojo::UserAgent::Proxy->new;
@@ -28,17 +31,17 @@ $proxy->detect;
 
 my %CACHE;
 
-Mojo::IOLoop->recurring(rand(scalar @ARGV) => sub {
+#Mojo::IOLoop->recurring(rand(scalar @ARGV) => sub {
     my $loop = shift;
 
-    for my (@ARGV) {
+    for my $symbol (@ARGV) {
 
         $ua->max_redirects(1)->get(
-            "https://coinmarketcap.com/all/views/all/#USD" => sub {
+            "https://coinmarketcap.com/all/views/all/" => sub {
 
                 my ( $ua, $tx ) = @_;
 
-                my $symbol = uc $_;
+                $symbol = uc $symbol;
 
                 for ($tx->res->dom->find("table > tbody > tr")->each)
                 {
@@ -63,7 +66,7 @@ Mojo::IOLoop->recurring(rand(scalar @ARGV) => sub {
 
                             printf "%-6s TIME: %-10s PRICE: %-9s MARKETCAP: %-15s VOLUME: %-14s SUPPLY: %-14s\n",
                                 $symbol, $timestamp, $price, $marketcap, $volume, $supply;
-                            print color 'reset';
+
                         }
                         $CACHE{"$symbol"} = $checksum;
                     }
@@ -71,6 +74,6 @@ Mojo::IOLoop->recurring(rand(scalar @ARGV) => sub {
             }
         );
     }
-});
+#});
 
 Mojo::IOLoop->start unless Mojo::IOLoop->is_running;

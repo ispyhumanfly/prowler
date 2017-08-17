@@ -1,7 +1,7 @@
-package Prowler::Model::Result::Records;
+package Prowler::Model::Result::Record;
 use DBIx::Class::Candy -components => ['InflateColumn::DateTime'];
 
-table 'records';
+table 'record';
 
 column id => {
 
@@ -15,11 +15,16 @@ column datetime => {
     size => 50,
 };
 
-column record => {
+column checksum => {
+
+    data_type => 'varchar',
+    size => 32,
+};
+
+column output => {
 
     data_type => 'varchar',
     size => 250,
-    is_nullable => 1,
 };
 
 primary_key 'id';

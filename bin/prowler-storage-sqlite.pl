@@ -1,5 +1,11 @@
 #!/usr/bin/env perl
 
+BEGIN {
+
+    die "You must set the PROWLER_ROOT variable."
+      unless exists $ENV{PROWLER_ROOT};
+}
+
 use 5.018_000;
 use strict;
 use warnings;
@@ -18,7 +24,7 @@ use File::Temp;
 use File::Path;
 
 use Moo;
-use MooX::Options;
+use MooX::Options protect_argv => 0;
 use Perl6::Attributes;
 
 option name => (is => 'rw', short => 'n', required => 1, format => 's', doc => 'Tell me the name of this transaction.');

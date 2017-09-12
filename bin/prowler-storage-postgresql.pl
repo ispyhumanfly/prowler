@@ -1,5 +1,11 @@
 #!/usr/bin/env perl
 
+BEGIN {
+
+    die "You must set the PROWLER_ROOT variable."
+      unless exists $ENV{PROWLER_ROOT};
+}
+
 use 5.018_000;
 use strict;
 use warnings;

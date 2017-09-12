@@ -23,8 +23,7 @@ column checksum => {
 
 column output => {
 
-    data_type => 'varchar',
-    size => 250,
+    data_type => 'TEXT'
 };
 
 primary_key 'id';

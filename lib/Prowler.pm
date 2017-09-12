@@ -1,14 +1,18 @@
-package Prowler;
-
-use 5.018_000;
-use strict;
-use warnings;
-
 BEGIN {
 
     die "You must set the PROWLER_ROOT variable before instantiating Prowler.pm"
       unless exists $ENV{PROWLER_ROOT};
 }
+
+package Prowler;
+
+use 5.018_000;
+use strict;
+use warnings;
+use utf8;
+
+no if $] >= 5.018, warnings => "experimental::smartmatch";
+no if $] >= 5.018, warnings => "experimental::lexical_subs";
 
 our $ROOT = $ENV{PROWLER_ROOT};
 chdir $ROOT;

@@ -1,6 +1,6 @@
 .DS_Store
 .vscode
-output.txt
+*.txt
 *.tdy
 *.bak
 *.swp

@@ -1,5 +1,9 @@
 #!/usr/bin/env perl
 
+BEGIN {
+    $ENV{MOJO_MAX_MESSAGE_SIZE} = '0';
+};
+
 use 5.018_000;
 use strict;
 use warnings;
@@ -20,8 +24,6 @@ use Try::Tiny;
 my $ua = Mojo::UserAgent->new;
 
 #$ua->proxy->http('socks://127.0.0.1:9050');
-
-$ENV{MOJO_MAX_MESSAGE_SIZE} = '0';
 
 my %CACHE;
 

@@ -15,6 +15,7 @@ use Mojo::Util qw/ md5_sum /;
 use Try::Tiny;
 use DateTime;
 use File::Temp;
+use File::Path;
 
 use Moo;
 use MooX::Options;
@@ -28,8 +29,11 @@ sub run {
 
     my $self = shift;
 
-    system "sqlite3 $.path/$.name.db < lib/Prowler/Model/Result/Record.sql"
-        unless -e "$.path/$.name.db";
+    unless (-e "$.path/$.name.db") {
+        exit(1) if not -d $.path;
+        system "sqlite3 $.path/$.name.db < lib/Prowler/Model/Result/Record.sql"
+    }
+
 
     my %CACHE;
 

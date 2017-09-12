@@ -53,8 +53,8 @@ my %CACHE;
 
                         my $timestamp = DateTime->now;
 
-                        printf "%-6s TIME: %-19s PRICE: %-18s VOLUME: %-19s\n",
-                            $symbol, $timestamp, "$volume", $price;
+                        printf "%-6s TIME: %-19s PRICE: %-10s VOLUME: %-16s\n",
+                            $symbol, $timestamp, $price, $volume;
                         print color 'reset';
                     }
                     $CACHE{"$symbol"} = $checksum;

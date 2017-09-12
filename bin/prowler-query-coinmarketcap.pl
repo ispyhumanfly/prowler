@@ -34,19 +34,19 @@ my %CACHE;
 #Mojo::IOLoop->recurring(rand(scalar @ARGV) => sub {
     my $loop = shift;
 
-    for my $symbol (@ARGV) {
+    for my $coin (@ARGV) {
 
         $ua->max_redirects(1)->get(
             "https://coinmarketcap.com/all/views/all/" => sub {
 
                 my ( $ua, $tx ) = @_;
 
-                $symbol = uc $symbol;
+                $coin = uc $coin;
 
                 for ($tx->res->dom->find("table > tbody > tr")->each)
                 {
                     if ($_->at("td.text-left")) {
-                        next if $symbol ne $_->at("td.text-left")->text;
+                        next if $coin ne $_->at("td.text-left")->text;
                     }
 
                     try {
@@ -58,17 +58,17 @@ my %CACHE;
                         my $supply = $_->at("td:nth-child(6) > a")->text;
                         $supply =~ s/^\s+|\s+$//g;
 
-                        my $checksum = md5_sum "$symbol$price$marketcap$volume$supply";
+                        my $checksum = md5_sum "$coin$price$marketcap$volume$supply";
 
-                        unless (exists $CACHE{$symbol} and $CACHE{$symbol} eq $checksum) {
+                        unless (exists $CACHE{$coin} and $CACHE{$coin} eq $checksum) {
 
                             my $timestamp = DateTime->now;
 
                             printf "%-6s TIME: %-10s PRICE: %-9s MARKETCAP: %-15s VOLUME: %-14s SUPPLY: %-14s\n",
-                                $symbol, $timestamp, $price, $marketcap, $volume, $supply;
+                                $coin, $timestamp, $price, $marketcap, $volume, $supply;
 
                         }
-                        $CACHE{"$symbol"} = $checksum;
+                        $CACHE{"$coin"} = $checksum;
                     }
                 }
             }

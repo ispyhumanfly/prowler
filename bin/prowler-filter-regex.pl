@@ -29,7 +29,7 @@ sub run {
         if ($.expression) {
             if (not exists $CACHE{$_}) {
                 $CACHE{$_} = 0;
-                say $_;
+                say $_ if ($_ =~ m/$.expression/g);
             }
         }
     }

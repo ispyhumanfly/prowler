@@ -4,3 +4,4 @@ output.txt
 *.tdy
 *.bak
 *.swp
+*.db

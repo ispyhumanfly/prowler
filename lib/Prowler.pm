@@ -48,24 +48,46 @@ sub DEMOLISH {
 
 # Class Methods
 
-sub create {
+sub query {
 
     my $self = shift;
-    my $params = shift || '';
+    my $cli = shift || '';
 
-    my $command = "$ROOT/bin/opcreate $params";
-    my $output  = `$command`;
+    $cli = "$ROOT/bin/prowler-query-$cli";
+    my $output  = `$cli`;
     $output =~ s/\n//g;
     return $output;
 }
 
-sub delete {
+sub filter {
 
     my $self = shift;
-    my $params = shift || '';
+    my $cli = shift || '';
 
-    my $command = "$ROOT/bin/opdestroy $params";
-    my $output  = `$command`;
+    $cli = "$ROOT/bin/prowler-filter-$cli";
+    my $output  = `$cli`;
+    $output =~ s/\n//g;
+    return $output;
+}
+
+sub format {
+
+    my $self = shift;
+    my $cli = shift || '';
+
+    $cli = "$ROOT/bin/prowler-format-$cli";
+    my $output  = `$cli`;
+    $output =~ s/\n//g;
+    return $output;
+}
+
+sub storage {
+
+    my $self = shift;
+    my $cli = shift || '';
+
+    $cli = "$ROOT/bin/prowler-storage-$cli";
+    my $output  = `$cli`;
     $output =~ s/\n//g;
     return $output;
 }

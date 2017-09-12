@@ -1,3 +1,10 @@
+
+BEGIN {
+
+    die "You must set the PROWLER_ROOT variable before instantiating Prowler.pm"
+      unless exists $ENV{PROWLER_ROOT};
+}
+
 package Prowler::Model::Result::Record;
 use DBIx::Class::Candy -components => ['InflateColumn::DateTime'];
 

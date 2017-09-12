@@ -1,3 +1,5 @@
+#!/usr/bin/env perl
+
 BEGIN {
 
     die "You must set the PROWLER_ROOT envivironment variable."

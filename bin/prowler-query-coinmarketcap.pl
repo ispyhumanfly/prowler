@@ -2,8 +2,11 @@
 
 BEGIN {
 
-    $ENV{MOJO_MAX_MESSAGE_SIZE} = '0';
-};
+    die "You must set the PROWLER_ROOT envivironment variable."
+      unless exists $ENV{PROWLER_ROOT};
+}
+
+$ENV{MOJO_MAX_MESSAGE_SIZE} = '0';
 
 use 5.018_000;
 use strict;

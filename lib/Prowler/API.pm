@@ -4,7 +4,7 @@ BEGIN {
       unless exists $ENV{PROWLER_ROOT};
 }
 
-package Prowler;
+package Prowler::API;
 
 use 5.018_000;
 use strict;
@@ -27,7 +27,7 @@ use namespace::clean;
 
 ## Class Parameters
 
-has json => ( is => 'rw' );
+#has json => ( is => 'rw' );
 
 ### Setup
 

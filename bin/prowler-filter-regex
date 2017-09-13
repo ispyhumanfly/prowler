@@ -19,7 +19,15 @@ use MooX::Options;
 use Perl6::Attributes;
 use Try::Tiny;
 
-option expression => (is => 'rw', short => 'e', required => 1, format => 's', doc => 'Perl regular expression to use as a filter.');
+option string => (
+    is => 'rw',
+    short => 's',
+    required => 1,
+    format => 's@',
+    doc => 'Perl regular expression string to use as a filter.'
+);
+
+option 'verbose' => (is => 'ro', negatable => 1);
 
 my %CACHE;
 
@@ -32,10 +40,13 @@ sub run {
         next if not $_;
         s/^\s+|\s+$//g;
 
-        if ($.expression) {
-            if (not exists $CACHE{$_}) {
-                $CACHE{$_} = 0;
-                say $_ if ($_ =~ m/$.expression/g);
+        if ($.string) {
+
+            for my $string ($@{$.string}) {
+                if (not exists $CACHE{$string}) {
+                    $CACHE{$string} = 0;
+                    say $_ if m/$string/g;
+                }
             }
         }
     }

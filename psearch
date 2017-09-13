@@ -1,0 +1,3 @@
+#!/bin/bash
+
+time cat <(./bin/prowler-query-google.pl $@ 2>/dev/null & ./bin/prowler-query-duckduckgo.pl $@ 2>/dev/null & ./scripts/prowler-query-bing.pl $@ 2>/dev/null)

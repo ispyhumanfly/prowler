@@ -1,3 +1,48 @@
-#!/bin/bash
+#!/usr/bin/env perl
 
-time cat <(./scripts/prowler-engine-google.pl $@ 2>/dev/null & ./scripts/prowler-engine-duckduckgo.pl $@ 2>/dev/null & ./scripts/prowler-engine-bing.pl $@ 2>/dev/null)
+BEGIN {
+
+    die "You must set the PROWLER_ROOT envivironment variable."
+      unless exists $ENV{PROWLER_ROOT};
+}
+
+use 5.018_000;
+use strict;
+use warnings;
+use utf8;
+
+no if $] >= 5.018, warnings => "experimental::smartmatch";
+no if $] >= 5.018, warnings => "experimental::lexical_subs";
+
+use lib 'lib/';
+use Prowler::Model;
+use Prowler::API;
+
+use Mojo::Util qw/ md5_sum /;
+use Try::Tiny;
+use DateTime;
+use File::Temp;
+use File::Path;
+
+use Moo;
+use MooX::Options protect_argv => 0;
+use Perl6::Attributes;
+
+option query => (is => 'rw', short => 'n', format => 's', doc => 'Tell me the name of this transaction.');
+option filter => (is => 'rw', short => 'f', format => 's', doc => 'Tell me the name of this transaction.');
+option format => (is => 'rw', short => 'fb', format => 's', doc => 'Tell me the name of this transaction.');
+option storage => (is => 'rw', short => 's', format => 's', doc => 'Tell me the name of this transaction.');
+
+option 'verbose' => (is => 'ro', negatable => 1);
+
+sub run {
+
+    my $self = shift;
+
+    my $cli = Prowler::API->query("$.query @ARGV");
+
+}
+
+main->new_with_options->run;
+
+exit(0);

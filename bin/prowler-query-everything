@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cat <($PROWLER_ROOT/bin/prowler-query-google $@ 2>/dev/null & $PROWLER_ROOT/bin/prowler-query-duckduckgo $@ 2>/dev/null & $PROWLER_ROOT/bin/prowler-query-bing $@ 2>/dev/null)
+cat <($PROWLER_ROOT/bin/prowler-query-google $@ 2>/dev/null & $PROWLER_ROOT/bin/prowler-query-duckduckgo $@ 2>/dev/null & $PROWLER_ROOT/bin/prowler-query-bing $@ 2>/dev/null)

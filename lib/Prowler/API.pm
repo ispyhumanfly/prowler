@@ -53,9 +53,12 @@ sub query {
     my $self = shift;
     my $cli = shift || '';
 
-    $cli = "$ROOT/bin/prowler-query-$cli";
+    $cli = "$ROOT/bin/prowler-query-$cli @ARGV 2>/dev/null";
     my $output  = `$cli`;
+    say $output;
     $output =~ s/\n//g;
+    say $output;
+
     return $output;
 }
 
@@ -64,7 +67,7 @@ sub filter {
     my $self = shift;
     my $cli = shift || '';
 
-    $cli = "$ROOT/bin/prowler-filter-$cli";
+    $cli = "$ROOT/bin/prowler-filter-$cli 2>/dev/null";
     my $output  = `$cli`;
     $output =~ s/\n//g;
     return $output;
@@ -75,7 +78,7 @@ sub format {
     my $self = shift;
     my $cli = shift || '';
 
-    $cli = "$ROOT/bin/prowler-format-$cli";
+    $cli = "$ROOT/bin/prowler-format-$cli 2>/dev/null";
     my $output  = `$cli`;
     $output =~ s/\n//g;
     return $output;
@@ -86,9 +89,11 @@ sub storage {
     my $self = shift;
     my $cli = shift || '';
 
-    $cli = "$ROOT/bin/prowler-storage-$cli";
+    $cli = "$ROOT/bin/prowler-storage-$cli 2>/dev/null";
     my $output  = `$cli`;
     $output =~ s/\n//g;
+    say $output;
+
     return $output;
 }
 

@@ -15,7 +15,7 @@ no if $] >= 5.018, warnings => "experimental::smartmatch";
 no if $] >= 5.018, warnings => "experimental::lexical_subs";
 
 use lib 'lib/';
-use Prowler::Model;
+use Prowler::Storage;
 
 use Mojo::Util qw/ md5_sum /;
 use Try::Tiny;

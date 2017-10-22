@@ -5,7 +5,7 @@ BEGIN {
       unless exists $ENV{PROWLER_ROOT};
 }
 
-package Prowler::Model::Result::Record;
+package Prowler::Storage::Result::Record;
 use DBIx::Class::Candy -components => ['InflateColumn::DateTime'];
 
 table 'record';

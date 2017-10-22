@@ -1,4 +1,4 @@
-package Prowler::Model;
+package Prowler::Storage;
 use base qw/DBIx::Class::Schema/;
 
 our $VERSION = '1.0.0';

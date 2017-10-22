@@ -15,7 +15,7 @@ no if $] >= 5.018, warnings => "experimental::smartmatch";
 no if $] >= 5.018, warnings => "experimental::lexical_subs";
 
 use lib 'lib/';
-use Prowler::Model;
+use Prowler::Storage;
 use Prowler::API;
 
 use Mojo::Util qw/ md5_sum /;
@@ -28,9 +28,9 @@ use Moo;
 use MooX::Options protect_argv => 0;
 use Perl6::Attributes;
 
-option query => (is => 'rw', short => 'n', format => 's', doc => 'Tell me the name of this transaction.');
-option filter => (is => 'rw', short => 'f', format => 's', doc => 'Tell me the name of this transaction.');
-option format => (is => 'rw', short => 'fb', format => 's', doc => 'Tell me the name of this transaction.');
+option query => (is => 'rw', short => 'q', format => 's', doc => 'Tell me the name of this transaction.');
+option filter => (is => 'rw', short => 'fil', format => 's', doc => 'Tell me the name of this transaction.');
+option format => (is => 'rw', short => 'for', format => 's', doc => 'Tell me the name of this transaction.');
 option storage => (is => 'rw', short => 's', format => 's', doc => 'Tell me the name of this transaction.');
 
 option 'verbose' => (is => 'ro', negatable => 1);
@@ -39,8 +39,10 @@ sub run {
 
     my $self = shift;
 
-    my $cli = Prowler::API->query("$.query @ARGV");
-
+    say Prowler::API->query($.query) if $.query;
+    say Prowler::API->filter($.filter) if $.filter;
+    say Prowler::API->format($.format) if $.format;
+    say Prowler::API->storage($.storage) if $.storage;
 }
 
 main->new_with_options->run;

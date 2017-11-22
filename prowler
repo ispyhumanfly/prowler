@@ -33,7 +33,7 @@ option filter => (is => 'rw', short => 'fil', format => 's', doc => 'Tell me the
 option format => (is => 'rw', short => 'for', format => 's', doc => 'Tell me the name of this transaction.');
 option storage => (is => 'rw', short => 's', format => 's', doc => 'Tell me the name of this transaction.');
 
-option 'verbose' => (is => 'ro', negatable => 1);
+option 'verbose' => (is => 'ro', short => 'v', negatable => 1);
 
 sub run {
 

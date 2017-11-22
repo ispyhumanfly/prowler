@@ -38,8 +38,8 @@ $proxy->detect;
 $ua->max_connections(25);
 $ua->request_timeout(10);
 
-Mojo::IOLoop->recurring(int(rand(scalar @ARGV)) => sub {
-    my $loop = shift;
+#Mojo::IOLoop->recurring(int(rand(scalar @ARGV)) => sub {
+    #my $loop = shift;
 
     for my $symbol (@ARGV) {
 
@@ -53,7 +53,7 @@ Mojo::IOLoop->recurring(int(rand(scalar @ARGV)) => sub {
                 my $timestamp = DateTime->now;
                 my $price = pop @{$tx->res->json->{data}->{$symbol}};
 
-                print color 'bold blue';
+                #print color 'bold blue';
 
                 unless (exists $CACHE{$symbol} and $CACHE{$symbol} eq $price) {
                     printf "%-6s TIME: %-19s PRICE: %-16s\n",
@@ -64,6 +64,6 @@ Mojo::IOLoop->recurring(int(rand(scalar @ARGV)) => sub {
             }
         );
     }
-});
+#});
 
 Mojo::IOLoop->start unless Mojo::IOLoop->is_running;

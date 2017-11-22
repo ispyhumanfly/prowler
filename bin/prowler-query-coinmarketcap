@@ -35,7 +35,7 @@ $proxy->detect;
 my %CACHE;
 
 #Mojo::IOLoop->recurring(rand(scalar @ARGV) => sub {
-    my $loop = shift;
+    #my $loop = shift;
 
     for my $coin (@ARGV) {
 

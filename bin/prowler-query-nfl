@@ -1,0 +1,56 @@
+#!/usr/bin/env perl
+
+BEGIN {
+
+    die "You must set the PROWLER_ROOT envivironment variable."
+      unless exists $ENV{PROWLER_ROOT};
+}
+
+$ENV{MOJO_MAX_MESSAGE_SIZE} = '0';
+
+use 5.018_000;
+use strict;
+use warnings;
+use utf8;
+
+no if $] >= 5.018, warnings => "experimental::smartmatch";
+no if $] >= 5.018, warnings => "experimental::lexical_subs";
+
+use Mojo::Asset::Memory;
+use Mojo::UserAgent;
+use Mojo::UserAgent::Proxy;
+use Mojo::IOLoop;
+
+use Mojo::Util qw/ md5_sum /;
+use Mojo::JSON qw/ decode_json encode_json /;
+use Try::Tiny;
+use DateTime;
+
+use Term::ANSIColor;
+
+$ENV{MOJO_MAX_MESSAGE_SIZE} = '0';
+
+my $ua = Mojo::UserAgent->new;
+my $proxy = Mojo::UserAgent::Proxy->new;
+$proxy->detect;
+
+my %CACHE;
+
+for (@ARGV) {
+
+    my $year = $_;
+
+    for (my $reg = 1; $reg <=17; $reg++) {
+        $ua->max_redirects(1)->get(
+            "http://www.nfl.com/scores/$year/REG$reg" => sub {
+
+                my ( $ua, $tx ) = @_;
+
+                    my $game = $tx->at('span.date')->text;
+                    say $game;
+            }
+        );
+    }
+}
+
+Mojo::IOLoop->start unless Mojo::IOLoop->is_running;

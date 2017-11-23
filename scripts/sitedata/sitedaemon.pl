@@ -1,11 +1,5 @@
 #!/usr/bin/env perl
 
-BEGIN {
-
-    die "You must set the PROWLER_ROOT envivironment variable."
-      unless exists $ENV{PROWLER_ROOT};
-}
-
 $ENV{MOJO_MAX_MESSAGE_SIZE} = '0';
 
 use 5.018_000;
@@ -27,8 +21,13 @@ use Try::Tiny;
 use IO::File;
 use URI;
 
+my $sitedata = $ENV{'SITEDATA'} || '.sitedata';
+
+mkdir $sitedata and data_collector()
+    unless (-e $sitedata and -d $sitedata);
+
 my $timestamp = DateTime->now;
-say "$timestamp\tSite Agent for @ARGV...";
+say "$timestamp\tSite Daemon for @ARGV...";
 
 # Console Monitor
 Mojo::IOLoop->recurring(30 => sub {
@@ -40,24 +39,7 @@ Mojo::IOLoop->recurring(30 => sub {
 # Collector (every 15 minutes)
 Mojo::IOLoop->recurring(300 => sub {
     my $loop = shift;
-    my $timestamp = DateTime->now;
-
-    say "$timestamp\tRunning Collector...";
-
-    my $collected = IO::File->new("data/$timestamp.collected", "w");
-
-    open my $sitecrawler, "$ENV{PROWLER_ROOT}/scripts/sitecrawler.pl @ARGV |";
-    while (<$sitecrawler>){
-
-        print $_;
-
-        if (defined $collected) {
-
-            print $collected $_;
-            undef $collected;
-        }
-    }
-    close $sitecrawler;
+    data_collector();
 });
 
 # Processor (every 45 minutes)
@@ -67,8 +49,8 @@ Mojo::IOLoop->recurring(600 => sub {
 
     say "$timestamp\tRunning Processor...";
 
-    opendir(DIR, "data")
-        or die "Could not open 'data'\n";
+    opendir(DIR, $sitedata)
+        or die "Could not open '$sitedata'\n";
 
     my @files = grep(/collected/, readdir DIR);
     closedir DIR;
@@ -95,5 +77,34 @@ Mojo::IOLoop->recurring(600 => sub {
         }
     }
 });
+
+sub data_collector {
+
+    my $data = shift;
+    my $timestamp = DateTime->now;
+
+    say "$timestamp\tRunning Collector...";
+
+    my $collected = IO::File->new("$sitedata/$timestamp.collected", "a");
+
+    open my $sitequery, "./sitequery.pl @ARGV |";
+    while (<$sitequery>){
+
+        print $_;
+
+        if (defined $collected) {
+
+            print $collected $_;
+            undef $collected;
+        }
+    }
+
+    close $sitequery;
+    close $collected;
+}
+
+sub data_processor {
+    my $data = shift;
+}
 
 Mojo::IOLoop->start unless Mojo::IOLoop->is_running;

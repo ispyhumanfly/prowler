@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+$ENV{MOJO_MAX_MESSAGE_SIZE} = '0';
+
 use 5.018_000;
 use strict;
 use warnings;
@@ -22,21 +24,23 @@ use Mojo::JSON qw/ decode_json encode_json /;
 
 my %RESULTS;
 
-opendir(DIR, "./data/")
-    or die "Could not open './data/'\n";
+my $sitedata = $ENV{'SITEDATA'} || '.sitedata';
 
-my @xml_files = grep(/collected/, readdir DIR);
+opendir(DIR, $sitedata)
+    or die "Could not open '$sitedata'\n";
+
+my @records = grep(/collected/, readdir DIR);
 closedir DIR;
 
-foreach my $xml_file(@xml_files) {
+for my $record (@records) {
 
-    open(my $fh, "./data/$xml_file")
-        or die "Could not open file '$xml_file' $!";
+    open(my $collected, "$sitedata/$record")
+        or die "Could not open file '$record' $!";
 
-    while (my $row = <$fh>) {
-        chomp $row;
-        $RESULTS{$row} = 0;
-        say $row;
+    while (my $entry = <$collected>) {
+        chomp $entry;
+        $RESULTS{$entry} = 0;
+        print $entry;
     }
 }
 

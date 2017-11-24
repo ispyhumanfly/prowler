@@ -48,13 +48,12 @@ Mojo::IOLoop->recurring(30 => sub {
 
     my $collected = IO::File->new("$sitemap/$timestamp.collected", "a");
 
-    open my $siteindex, "./siteindex.pl @ARGV |";
-    while (<$siteindex>){
-
+    open my $sitemapper, "./linkinspector-sitemapper.pl @ARGV |";
+    while (<$sitemapper>){
         say $collected $_;
     }
     close $collected;
-    close $siteindex;
+    close $sitemapper;
 });
 
 ### Processor

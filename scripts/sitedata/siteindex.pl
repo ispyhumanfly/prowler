@@ -43,15 +43,8 @@ $ua->max_redirects(5)->get(
 
                 try {
 
-                    my $link;
-
-                    $link = $_;
-                    $link = $link if m/^http.*/g;
-
-                    $link = "$ARGV[0]$_" if m/^\//g;
-                    $link = "$ARGV[0]/$_" if m/^.*[A-Za-z0-9_.]+\//g;
-
-                    if ($link and $link =~ m/$ARGV[0]/g) {
+                        my $link = normalize_link($_);
+                        if ($link and $link =~ m/$ARGV[0]/g) {
 
                         say $link;
 
@@ -65,14 +58,7 @@ $ua->max_redirects(5)->get(
 
                                 try {
 
-                                    my $link;
-
-                                    $link = $_;
-                                    $link = $link if m/^http.*/g;
-
-                                    $link = "$ARGV[0]$_" if m/^\//g;
-                                    $link = "$ARGV[0]/$_" if m/^.*[A-Za-z0-9_.]+\//g;
-
+                                    my $link = normalize_link($_);
                                     if ($link and $link =~ m/$ARGV[0]/g) {
 
                                         say $link;
@@ -80,9 +66,7 @@ $ua->max_redirects(5)->get(
                                         for ($ua->max_redirects(5)->get($link)->res->dom->find("a")->map(attr => "href")->each) {
                                             next unless $_;
 
-                                            $link = "$ARGV[0]$_" if m/^\//g;
-                                            $link = "$ARGV[0]/$_" if m/^.*[A-Za-z0-9_.]+\//g;
-
+                                            my $link = normalize_link($_);
                                             if ($link and $link =~ m/$ARGV[0]/g) {
 
                                                 say $link;
@@ -97,14 +81,7 @@ $ua->max_redirects(5)->get(
 
                                                         try {
 
-                                                            my $link;
-
-                                                            $link = $_;
-                                                            $link = $link if m/^http.*/g;
-
-                                                            $link = "$ARGV[0]$_" if m/^\//g;
-                                                            $link = "$ARGV[0]/$_" if m/^.*[A-Za-z0-9_.]+\//g;
-
+                                                            my $link = normalize_link($_);
                                                             if ($link and $link =~ m/$ARGV[0]/g) {
 
                                                                 say $link;
@@ -112,11 +89,40 @@ $ua->max_redirects(5)->get(
                                                                 for ($ua->max_redirects(5)->get($link)->res->dom->find("a")->map(attr => "href")->each) {
                                                                     next unless $_;
 
-                                                                    $link = "$ARGV[0]$_" if m/^\//g;
-                                                                    $link = "$ARGV[0]/$_" if m/^.*[A-Za-z0-9_.]+\//g;
-
+                                                                    my $link = normalize_link($_);
                                                                     if ($link and $link =~ m/$ARGV[0]/g) {
+
                                                                         say $link;
+
+                                                                        ### Level 4
+
+                                                                        for ($ua->max_redirects(5)->get($link)->res->dom->find("a")->map(attr => "href")->each) {
+                                                                            next unless $_;
+
+                                                                            if (not exists $CACHE{$_}) {
+                                                                                $CACHE{$_} = 0;
+
+                                                                                try {
+
+                                                                                    my $link = normalize_link($_);
+                                                                                    if ($link and $link =~ m/$ARGV[0]/g) {
+
+                                                                                        say $link;
+
+                                                                                        for ($ua->max_redirects(5)->get($link)->res->dom->find("a")->map(attr => "href")->each) {
+                                                                                            next unless $_;
+
+                                                                                            my $link = normalize_link($_);
+                                                                                            if ($link and $link =~ m/$ARGV[0]/g) {
+
+                                                                                                say $link;
+                                                                                            }
+                                                                                        }
+                                                                                    }
+                                                                                }
+                                                                            }
+                                                                        }
+
                                                                     }
                                                                 }
                                                             }
@@ -135,5 +141,11 @@ $ua->max_redirects(5)->get(
         }
     }
 );
+
+sub normalize_link {
+    my $link = shift;
+    $link = URI->new_abs( $link, "http://" . $ARGV[0]);
+    return $link;
+}
 
 Mojo::IOLoop->start unless Mojo::IOLoop->is_running;

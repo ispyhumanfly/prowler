@@ -15,6 +15,8 @@ use Mojo::Asset::Memory;
 use Mojo::UserAgent;
 use Mojo::IOLoop;
 
+use URI;
+
 my $ua = Mojo::UserAgent->new;
 
 $ua->max_connections(60);

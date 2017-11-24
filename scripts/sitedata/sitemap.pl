@@ -24,37 +24,34 @@ use Mojo::JSON qw/ decode_json encode_json /;
 
 my %RESULTS;
 
-my $sitedata = $ENV{'SITEDATA'} || '.sitedata';
+my $sitemap = $ENV{'SITEMAP'} || '.sitemap';
 
-opendir(DIR, $sitedata)
-    or die "Could not open '$sitedata'\n";
+opendir(DIR, $sitemap)
+    or die "Could not open '$sitemap'\n";
 
-my @records = grep(/collected/, readdir DIR);
+my @records = grep(/processed/, readdir DIR);
 closedir DIR;
 
 for my $record (@records) {
 
-    open(my $collected, "$sitedata/$record")
+    open my $collected, "$sitemap/$record"
         or die "Could not open file '$record' $!";
 
     while (my $entry = <$collected>) {
         chomp $entry;
         $RESULTS{$entry} = 0;
-        print $entry;
     }
+    close $collected;
 }
 
 my $ua = Mojo::UserAgent->new;
 
-for (sort keys %RESULTS) {
-    try {
+$ua->max_connections(60);
+$ua->request_timeout(60);
+$ua->connect_timeout(60);
 
-        my $video = $ua->get($_)->res->dom->at('title')->text;
-        $video =~ s/[^\x00-\x7f]//g;
-        say $video;
-        $_ =~ s/[^\x00-\x7f]//g;
-        say "\t$_\n" and sleep 1;
-    }
+for (sort keys %RESULTS) {
+    say $_;
 }
 
 exit 0;

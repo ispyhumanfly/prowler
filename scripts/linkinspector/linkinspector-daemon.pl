@@ -29,6 +29,10 @@ my $sitemap = $ENV{'SITEMAP'} || '.sitemap';
 
 mkdir $sitemap unless (-e $sitemap and -d $sitemap);
 
+for (@ARGV) {
+    mkdir "$sitemap/$_" for @ARGV;
+}
+
 $SIG{'INT'} = sub {
     if (rmtree $sitemap) {
         say "\n$timestamp\tCleaning up...";
@@ -46,14 +50,25 @@ Mojo::IOLoop->recurring(30 => sub {
 
     say "$timestamp\tRunning Collector...";
 
-    my $collected = IO::File->new("$sitemap/$timestamp.collected", "a");
+    for my $domain (@ARGV) {
 
-    open my $sitemapper, "./linkinspector-sitemapper.pl @ARGV |";
-    while (<$sitemapper>){
-        say $collected $_;
+        my $collected = IO::File->new("$sitemap/$domain/$timestamp.collected", "a");
+
+        #open my $sitemapper, "perl linkinspector-sitemapper.pl $domain |";
+
+        my $sitemapper = readpipe("perl linkinspector-sitemapper.pl $domain");
+        my @sitemapper = split /\n/ , $sitemapper;
+        #print "@sitemapper";
+
+        for my $link (@sitemapper){
+            try {
+                say $collected $link;
+            };
+        }
+        close $collected;
+        #close $sitemapper;
+        sleep 1;
     }
-    close $collected;
-    close $sitemapper;
 });
 
 ### Processor
@@ -64,28 +79,37 @@ Mojo::IOLoop->recurring(60 => sub {
 
     say "$timestamp\tRunning Processor...";
 
-    opendir(DIR, $sitemap)
-        or die "Could not open '$sitemap'\n";
+    my %PROCESSED;
 
-    my @files = grep(/collected/, readdir DIR);
-    closedir DIR;
+    for my $domain (@ARGV) {
 
-    for my $collected (@files) {
+        opendir(DIR, "$sitemap/$domain")
+            or die "Could not open '$sitemap/$domain'\n";
 
-        my $record = IO::File->new("$sitemap/$collected", "r");
-        my $processed = IO::File->new("$sitemap/$timestamp.processed", "a");
+        my @files = grep(/collected/, readdir DIR);
+        closedir DIR;
 
-        if (defined $record) {
+        for my $collected (@files) {
 
-            while (<$record>) {
+            my $record = IO::File->new("$sitemap/$domain/$collected", "r");
+            my $processed = IO::File->new("$sitemap/$domain/$timestamp.processed", "a");
 
-                if (defined $processed) {
-                    print $processed $_;
+            if (defined $record) {
+
+                while (<$record>) {
+
+                    if (defined $processed) {
+
+                        unless (exists $PROCESSED{$_}) {
+                            $PROCESSED{$_} = 0;
+                            print $processed $_;
+                        }
+                    }
                 }
+                close $record;
             }
-            close $record;
+            undef $processed;
         }
-        undef $processed;
     }
 });
 

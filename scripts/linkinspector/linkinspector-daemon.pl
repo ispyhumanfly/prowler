@@ -23,7 +23,7 @@ use File::Path;
 use URI;
 
 my $timestamp = DateTime->now;
-say "\n@ARGV\n\n$timestamp\tStarting...";
+say "\n@ARGV\n\n$timestamp\tStarting LinkInspector Daemon...";
 
 my $sitemap = $ENV{'SITEMAP'} || '.sitemap';
 
@@ -37,13 +37,13 @@ $SIG{'INT'} = sub {
     if (rmtree $sitemap) {
         say "\n$timestamp\tCleaning up...";
     }
-    say "$timestamp\tExiting Site Daemon...";
+    say "$timestamp\tExiting LinkInspector Daemon...";
     exit 0;
 };
 
 ### Collector
 
-Mojo::IOLoop->recurring(30 => sub {
+Mojo::IOLoop->recurring((15 * scalar @ARGV) => sub {
     my $loop = shift;
 
     my $timestamp = DateTime->now;
@@ -65,7 +65,10 @@ Mojo::IOLoop->recurring(30 => sub {
                 say $collected $link;
             };
         }
-        close $collected;
+        try {
+            close $collected;
+        };
+
         #close $sitemapper;
         sleep 1;
     }
@@ -73,7 +76,7 @@ Mojo::IOLoop->recurring(30 => sub {
 
 ### Processor
 
-Mojo::IOLoop->recurring(60 => sub {
+Mojo::IOLoop->recurring((30 * scalar @ARGV) => sub {
     my $loop = shift;
     my $timestamp = DateTime->now;
 

@@ -25,10 +25,13 @@ use File::Path;
 use File::Spec;
 use DateTime;
 
+use Net::Whois::Parser;
+$Net::Whois::Parser::GET_ALL_VALUES = 1;
+
 my $sitemap = $ENV{'SITEMAP'} || '.sitemap';
-my $timestamp = DateTime->now;
 
 $SIG{'INT'} = sub {
+    my $timestamp = DateTime->now;
     say "\n$timestamp\tExiting LinkInspector Validator...\n";
     exit 0;
 };
@@ -40,7 +43,7 @@ for my $domain (@ARGV) {
     opendir(DIR, "$sitemap/$domain")
         or die "Could not open: '$sitemap/$domain'\n";
 
-    push @{ $RECORDS{$domain} }, grep(/processed/, readdir DIR);
+    push @{ $RECORDS{$domain} }, grep(/cleaned/, readdir DIR);
     closedir DIR;
 }
 
@@ -69,6 +72,8 @@ $ua->max_connections(60);
 $ua->request_timeout(60);
 $ua->connect_timeout(60);
 
+my %CACHE = ();
+
 for my $entry (sort keys %LINKS) {
 
     $ua->get($entry => sub {
@@ -77,61 +82,111 @@ for my $entry (sort keys %LINKS) {
 
         for my $link ($tx->res->dom->find("a")->map( attr => 'href' )->each) {
 
+            ## For now, don't show the same link twice...
+            next if exists $CACHE{$link};
+            $CACHE{$link} = 0;
+
             my $uri = URI->new($link);
+            my $timestamp = DateTime->now;
 
-            if ($uri) {
+            try {
+
+                my $root = $uri->host;
+
+                ### This appears to be a fully qualified URL...
+
                 try {
+                    if(my $res = $ua->get($link)->res) {
+                        if(my $code = $res->code) {
 
-                    my $root = $uri->host;
+                            ## There needs to be finer checking done here.
 
-                    try {
-                        if(my $res = $ua->get($link)->res) {
-                            if($res->code) {
-                                say "Link Connected: $link";
-                            }
+                            say "$timestamp $code $link";
+                            sleep 1 if $code != 200;
+                        }
+                        else {
+                            say "$timestamp XXX $link";
+                            sleep 1;
                         }
                     }
-                    catch {
-                        say "Link Error: $link";
-                        #say "Inspecting $root\n";
-                        #say "$link\n";
+                    else {
+                        say "$timestamp XXX $link";
+                        sleep 1;
+                    }
+                };
+            }
+            catch {
 
-                        #my $info = parse_whois( domain => $root );
+                ### If we're here, URI couldn't get a hostname from the link.
 
-                        #use Data::Dumper;
-                        #say Dumper($info);
-                    };
-                }
-                catch {
-
-                    ### If we're here, URI couldn't get a hostname from the link.
-
+                try {
                     my $root = $ARGV[0];
+                    $link = URI->new_abs($link, $root);
 
                     unless ($link =~ m/javascript|mailto/g) {
-                        if(my $res = $ua->get("$root$link")->res){
-                            if($res->code) {
-                                say "Link Connected: $root$link";
+                        if(my $res = $ua->get($link)->res){
+                            if(my $code = $res->code) {
+                                say "$timestamp $code $link";
+                                sleep 1;
+                            }
+                            else {
+                                say "$timestamp XXX $link";
+                                sleep 1;
                             }
                         }
                         else {
-                            say "Link Malformed: $link"
+                            say "$timestamp XXX $link";
+                            sleep 1;
                         }
                     }
-               }
-               finally {
-                   my $domain = $ARGV[0];
-                   try {
-                        #$domain = "http://$domain$link";
-                        #if($ua->get($link)->res->body) {
-                        #    say "Link Connected: $link";
-                        #}
+                    else {
+                        say "$timestamp XXX $link";
+                        sleep 1;
                     }
-                    catch {
-                        say "Link Malformed: $link";
+                }
+                catch {
+
+                    ### If we're here, it's likely this is a relative path...
+
+                    my $domain = $ARGV[0];
+
+                    if ($link =~ m/^\//g){
+                        if (my $res = $ua->get("$domain$link")->res) {
+                            if (my $code = $res->code) {
+
+                                $link = "$domain$link";
+
+                                say "$timestamp $code $link";
+                                sleep 1;
+                            }
+                            else {
+
+                                ### If we're here, we still couldn't get a status code.
+
+                                say "$timestamp XXX $link";
+                                sleep 1;
+                            }
+                        }
+                        else {
+
+                            ## If we're here, we couldn't resolve the host
+                            ## even with prepending the domain name.
+
+                            say "$timestamp XXX $link";
+                            sleep 1;
+                        }
                     }
-               };
+                };
             }
+            finally {
+
+                ### Run Whois lookup against specific status codes.
+
+                #my $info = parse_whois( domain => $root );
+                #use Data::Dumper;
+                #say Dumper($info);
+
+            };
         }
     });
 }

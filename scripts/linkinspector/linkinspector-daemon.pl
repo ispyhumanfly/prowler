@@ -116,4 +116,45 @@ Mojo::IOLoop->recurring((30 * scalar @ARGV) => sub {
     }
 });
 
+### Cleanser
+
+Mojo::IOLoop->recurring((60 * scalar @ARGV) => sub {
+    my $loop = shift;
+    my $timestamp = DateTime->now;
+
+    say "$timestamp\tRunning Cleanser...";
+
+    my %CLEANED;
+
+    for my $domain (@ARGV) {
+
+        opendir(DIR, "$sitemap/$domain")
+            or die "Could not open '$sitemap/$domain'\n";
+
+        my @files = grep(/processed/, readdir DIR);
+        closedir DIR;
+
+        for my $processed (@files) {
+
+            my $record = IO::File->new("$sitemap/$domain/$processed", "r");
+            my $cleaned = IO::File->new("$sitemap/$domain/$timestamp.cleaned", "a");
+
+            if (defined $record) {
+                while (<$record>) {
+
+                    if (defined $cleaned) {
+                        unless (exists $CLEANED{$_}) {
+
+                            $CLEANED{$_} = 0;
+                            print $cleaned $_;
+                        }
+                    }
+                }
+                close $record;
+            }
+            undef $cleaned;
+        }
+    }
+});
+
 Mojo::IOLoop->start unless Mojo::IOLoop->is_running;

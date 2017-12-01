@@ -27,6 +27,7 @@ use DateTime;
 
 use Net::Whois::Parser;
 $Net::Whois::Parser::GET_ALL_VALUES = 1;
+use Data::Dumper;
 
 my $sitemap = $ENV{'SITEMAP'} || '.sitemap';
 
@@ -73,14 +74,25 @@ $ua->request_timeout(60);
 $ua->connect_timeout(60);
 
 my %CACHE = ();
+my @RESULTS;
+
+my $timestamp = DateTime->now;
+
+say "$timestamp Beginning Inspection of $ARGV[0]...";
 
 for my $entry (sort keys %LINKS) {
 
+    print "$timestamp Inspecting $entry...\r\n";
+
     $ua->get($entry => sub {
+
+        #print "\r$entry";
 
         my ( $ua, $tx ) = @_;
 
         for my $link ($tx->res->dom->find("a")->map( attr => 'href' )->each) {
+            next unless $link;
+            #my $link = $_;
 
             ## For now, don't show the same link twice...
             next if exists $CACHE{$link};
@@ -89,29 +101,39 @@ for my $entry (sort keys %LINKS) {
             my $uri = URI->new($link);
             my $timestamp = DateTime->now;
 
+            my $status;
+
             try {
 
-                my $root = $uri->host;
+                my $host = $uri->host;
 
                 ### This appears to be a fully qualified URL...
 
                 try {
-                    if(my $res = $ua->get($link)->res) {
-                        if(my $code = $res->code) {
+                    if (my $res = $ua->get($link)->res) {
+                        if (my $code = $res->code) {
+
+                            $status = $code;
 
                             ## There needs to be finer checking done here.
 
                             say "$timestamp $code $link";
-                            sleep 1 if $code != 200;
+                            #push @RESULTS, "$timestamp $code $link";
                         }
                         else {
-                            say "$timestamp XXX $link";
-                            sleep 1;
+
+                            $status = 000;
+
+                            say "$timestamp 000 $link";
+                            #push @RESULTS, "$timestamp 000 $link";
                         }
                     }
                     else {
-                        say "$timestamp XXX $link";
-                        sleep 1;
+
+                        $status = 000;
+
+                        say "$timestamp 000 $link";
+                        #push @RESULTS, "$timestamp 000 $link";
                     }
                 };
             }
@@ -120,28 +142,40 @@ for my $entry (sort keys %LINKS) {
                 ### If we're here, URI couldn't get a hostname from the link.
 
                 try {
-                    my $root = $ARGV[0];
-                    $link = URI->new_abs($link, $root);
+                    my $host = $ARGV[0];
+                    $link = URI->new_abs($link, $host);
 
                     unless ($link =~ m/javascript|mailto/g) {
-                        if(my $res = $ua->get($link)->res){
-                            if(my $code = $res->code) {
+                        if (my $res = $ua->get($link)->res){
+                            if (my $code = $res->code) {
+
+                                $status = $code;
+
                                 say "$timestamp $code $link";
-                                sleep 1;
+                                #push @RESULTS, "$timestamp $code $link";
                             }
                             else {
-                                say "$timestamp XXX $link";
-                                sleep 1;
+
+                                $status = 000;
+
+                                say "$timestamp 000 $link";
+                                #push @RESULTS, "$timestamp 000 $link";
                             }
                         }
                         else {
-                            say "$timestamp XXX $link";
-                            sleep 1;
+
+                            $status = 000;
+
+                            say "$timestamp 000 $link";
+                            #push @RESULTS, "$timestamp 000 $link";
                         }
                     }
                     else {
-                        say "$timestamp XXX $link";
-                        sleep 1;
+
+                        $status = 000;
+
+                        say "$timestamp 000 $link";
+                        #push @RESULTS, "$timestamp 000 $link";
                     }
                 }
                 catch {
@@ -154,17 +188,21 @@ for my $entry (sort keys %LINKS) {
                         if (my $res = $ua->get("$domain$link")->res) {
                             if (my $code = $res->code) {
 
+                                $status = $code;
+
                                 $link = "$domain$link";
 
                                 say "$timestamp $code $link";
-                                sleep 1;
+                                #push @RESULTS, "$timestamp $code $link";
                             }
                             else {
 
+                                $status = 000;
+
                                 ### If we're here, we still couldn't get a status code.
 
-                                say "$timestamp XXX $link";
-                                sleep 1;
+                                say "$timestamp 000 $link";
+                                #push @RESULTS, "$timestamp 000 $link";
                             }
                         }
                         else {
@@ -172,8 +210,10 @@ for my $entry (sort keys %LINKS) {
                             ## If we're here, we couldn't resolve the host
                             ## even with prepending the domain name.
 
-                            say "$timestamp XXX $link";
-                            sleep 1;
+                            $status = 000;
+
+                            say "$timestamp 000 $link";
+                            #push @RESULTS, "$timestamp 000 $link";
                         }
                     }
                 };
@@ -182,16 +222,56 @@ for my $entry (sort keys %LINKS) {
 
                 ### Run Whois lookup against specific status codes.
 
-                #my $info = parse_whois( domain => $root );
-                #use Data::Dumper;
-                #say Dumper($info);
+                if ($status) {
 
+                    try {
+
+                        my $uri = URI->new($link);
+
+                        given ($status) {
+
+                            my $host = $uri->host;
+
+                            when ($status == 404) {
+
+                                say "$timestamp Attempting Whois on $host...";
+                                whois($host);
+                            }
+                            when ($status == 403) {
+
+                                say "$timestamp Attempting Whois on $host...";
+                                whois($host);
+                            }
+                            when ($status == 504) {
+
+                                say "$timestamp Attempting Whois on $host...";
+                                whois($host);
+                            }
+                            when ($status == 503) {
+
+                                say "$timestamp Attempting Whois on $host...";
+                                whois($host);
+                            }
+                        }
+                        sub whois {
+
+                            my $host = shift;
+
+                            try {
+                                my $info = parse_whois( domain => $host );
+                                say Dumper($info);
+                            };
+                        }
+                    };
+                }
             };
         }
     });
 }
 
 Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+
+say $_ for @RESULTS;
 
 exit 0;
 

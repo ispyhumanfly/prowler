@@ -23,7 +23,7 @@ use File::Path;
 use URI;
 
 my $timestamp = DateTime->now;
-say "\n@ARGV\n\n$timestamp\tStarting LinkInspector Daemon...";
+say "\n@ARGV\n\n$timestamp\tStarting LinkInspector Crawler...";
 
 my $sitemap = $ENV{'SITEMAP'} || '.sitemap';
 
@@ -34,29 +34,28 @@ for (@ARGV) {
 }
 
 $SIG{'INT'} = sub {
-    if (rmtree $sitemap) {
-        say "\n$timestamp\tCleaning up...";
-    }
-    say "$timestamp\tExiting LinkInspector Daemon...";
-    exit 0;
+    #f (rmtree $sitemap) {
+    #    say "\n$timestamp\tCleaning up...";
+    #}
+    say "$timestamp\tExiting LinkInspector Crawler..."
+        and exit 0;
 };
 
 ### Collector
 
-Mojo::IOLoop->recurring((15 * scalar @ARGV) => sub {
-    my $loop = shift;
+sub collector {
 
     my $timestamp = DateTime->now;
 
-    say "$timestamp\tRunning Collector...";
-
     for my $domain (@ARGV) {
+
+        say "$timestamp\tRunning LinkInspector Indexer for $domain...";
 
         my $collected = IO::File->new("$sitemap/$domain/$timestamp.collected", "a");
 
         #open my $sitemapper, "perl linkinspector-sitemapper.pl $domain |";
 
-        my $sitemapper = readpipe("perl linkinspector-sitemapper.pl $domain");
+        my $sitemapper = readpipe("perl linkinspector-indexer.pl $domain");
         my @sitemapper = split /\n/ , $sitemapper;
         #print "@sitemapper";
 
@@ -72,12 +71,12 @@ Mojo::IOLoop->recurring((15 * scalar @ARGV) => sub {
         #close $sitemapper;
         sleep 1;
     }
-});
+}
 
 ### Processor
 
-Mojo::IOLoop->recurring((30 * scalar @ARGV) => sub {
-    my $loop = shift;
+sub processor {
+
     my $timestamp = DateTime->now;
 
     say "$timestamp\tRunning Processor...";
@@ -114,12 +113,12 @@ Mojo::IOLoop->recurring((30 * scalar @ARGV) => sub {
             undef $processed;
         }
     }
-});
+}
 
 ### Cleanser
 
-Mojo::IOLoop->recurring((60 * scalar @ARGV) => sub {
-    my $loop = shift;
+sub cleanser {
+
     my $timestamp = DateTime->now;
 
     say "$timestamp\tRunning Cleanser...";
@@ -155,6 +154,11 @@ Mojo::IOLoop->recurring((60 * scalar @ARGV) => sub {
             undef $cleaned;
         }
     }
-});
+}
 
-Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
+sub main {
+    collector();
+    processor();
+    cleanser();
+}
+main() and exit 0;

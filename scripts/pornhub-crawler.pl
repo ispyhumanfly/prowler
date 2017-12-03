@@ -33,7 +33,7 @@ $ua->max_redirects(5)->get(
 
         my ( $ua, $tx ) = @_;
 
-        # Level 1
+        # Scrape the links off the page.
 
         for ($tx->res->dom->find("a")->map( attr => 'href' )->each) {
             next unless $_;

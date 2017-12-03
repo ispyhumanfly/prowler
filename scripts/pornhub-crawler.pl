@@ -29,7 +29,7 @@ $ua->request_timeout(60);
 $ua->connect_timeout(60);
 
 $ua->max_redirects(5)->get(
-    "http://www.italia.it" => sub {
+    "https://www.pornhub.com" => sub {
 
         my ( $ua, $tx ) = @_;
 
@@ -41,7 +41,7 @@ $ua->max_redirects(5)->get(
             if (not exists $CACHE{$_}) {
 
                 $CACHE{$_} = 0;
-                try { say "http://www.italia.it$_" if m/^\//g; }
+                say $_;
             }
         }
     }

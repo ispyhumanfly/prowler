@@ -33,6 +33,8 @@ my %CACHE;
 
 while (<STDIN>) {
 
+    s/.*http/http/;
+
     for ($ua->max_redirects(5)->get($_)->res->dom->find("a")->map(attr => "href")->each)
     {
         next if not $_;

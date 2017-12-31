@@ -29,6 +29,8 @@ $ua->connect_timeout(60);
 
 my %DATA;
 
+# Query YouTube Feed
+
 try {
 
     # YouTube Trending
@@ -69,11 +71,15 @@ try {
 
 Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
+# Display YouTube Results
+
 my $timestamp = DateTime->now;
 
 for my $user (keys %DATA) {
     for my $data (@{ $DATA{$user} }) {
         $user =~ s/\/user\///;
+
+        # Print to Terminal
         say "$timestamp $user $data";
     }
 }

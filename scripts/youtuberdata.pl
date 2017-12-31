@@ -14,6 +14,7 @@ use Mojo::Asset::Memory;
 use Mojo::UserAgent;
 use Mojo::IOLoop;
 use Mojo::Util qw/ camelize decamelize quote dumper url_escape url_unescape/;
+use DateTime;
 
 use Mojo::JSON qw/ decode_json encode_json /;
 use Try::Tiny;
@@ -22,12 +23,11 @@ use URI;
 my $ua = Mojo::UserAgent->new;
 #$ua->proxy->http('socks://127.0.0.1:9050');
 
-my %CACHE;
-
 $ua->max_connections(60);
 $ua->request_timeout(60);
 $ua->connect_timeout(60);
 
+my %DATA;
 
 try {
 
@@ -45,7 +45,7 @@ try {
 
                 if ($user =~ m/^\/user/g) {
 
-                    $CACHE{$user} = [];
+                    $DATA{$user} = [];
 
                     $ua->max_redirects(5)->get(
                         "https://youtube.com/$user/about" => sub {
@@ -56,7 +56,7 @@ try {
 
                             for my $data ($tx->res->dom->find("a")->map( attr => 'href' )->each){
                                 if ($data =~ m/^http/g) {
-                                    push @{ $CACHE{$user} }, $data;
+                                    push @{ $DATA{$user} }, $data;
                                }
                             }
                         }
@@ -69,9 +69,11 @@ try {
 
 Mojo::IOLoop->start unless Mojo::IOLoop->is_running;
 
-for (keys %CACHE) {
-    say $_;
-    for (@{ $CACHE{$_} }) {
-        say "\t$_";
+my $timestamp = DateTime->now;
+
+for my $user (keys %DATA) {
+    for my $data (@{ $DATA{$user} }) {
+        $user =~ s/\/user\///;
+        say "$timestamp $user $data";
     }
 }

@@ -14,8 +14,8 @@ use utf8;
 no if $] >= 5.018, warnings => "experimental::smartmatch";
 no if $] >= 5.018, warnings => "experimental::lexical_subs";
 
-use lib 'lib/';
-use Prowler::Model;
+use lib "$ENV{PROWLER_ROOT}/lib/";
+use Prowler::Storage;
 
 use Mojo::Util qw/ md5_sum /;
 use Try::Tiny;
@@ -38,7 +38,7 @@ sub run {
 
     unless (-e "$.path/$.name.db") {
         exit(1) if not -d $.path;
-        system "sqlite3 $.path/$.name.db < lib/Prowler/Model/Result/Record.sql"
+        system "sqlite3 $.path/$.name.db < $ENV{PROWLER_ROOT}/lib/Prowler/Storage/Result/Record.sql"
     }
 
 
@@ -48,7 +48,7 @@ sub run {
 
         print $_ if $.verbose;
 
-        my $sql = Prowler::Model->connect("dbi:SQLite:$.path/$.name.db");
+        my $sql = Prowler::Storage->connect("dbi:SQLite:$.path/$.name.db");
 
         my $checksum = md5_sum $_;
 

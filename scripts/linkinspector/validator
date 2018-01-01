@@ -54,7 +54,7 @@ for my $domain (@ARGV) {
     for my $record (sort keys %RECORDS) {
         for my $filepath (@{$RECORDS{$record}}) {
 
-            my $path = File::Spec->canonpath($filepath);
+            my $path = File::Spec->canonpath("$sitemap/$domain/$filepath");
 
             open my $collected, "$sitemap/$domain/$filepath" or die "Could not open file '$path' $!";
 
@@ -78,11 +78,7 @@ my @RESULTS;
 
 my $timestamp = DateTime->now;
 
-say "$timestamp Beginning Inspection of $ARGV[0]...";
-
 for my $entry (sort keys %LINKS) {
-
-    print "$timestamp Inspecting $entry...\r\n";
 
     $ua->get($entry => sub {
 

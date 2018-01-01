@@ -25,7 +25,7 @@ use IO::File;
 use File::Path;
 
 my $timestamp = DateTime->now;
-say "\n@ARGV\n\n$timestamp\tStarting LinkInspector Crawler...";
+say "\n@ARGV\n\n$timestamp\tStarting LinkInspector Spider...";
 
 my $sitemap = $ENV{'SITEMAP'} || '.sitemap';
 
@@ -39,7 +39,7 @@ $SIG{'INT'} = sub {
     #f (rmtree $sitemap) {
     #    say "\n$timestamp\tCleaning up...";
     #}
-    say "$timestamp\tExiting LinkInspector Crawler..."
+    say "$timestamp\tExiting LinkInspector Spider..."
         and exit 0;
 };
 
@@ -59,7 +59,7 @@ sub collector {
 
     for my $domain (@ARGV) {
 
-        say "$timestamp\tRunning LinkInspector Indexer for $domain...";
+        say "$timestamp\tRunning Collector on $domain...";
 
         sub normalize_link {
 
@@ -170,11 +170,11 @@ sub processor {
 
     my $timestamp = DateTime->now;
 
-    say "$timestamp\tRunning Processor...";
-
     my %PROCESSED;
 
     for my $domain (@ARGV) {
+
+        say "$timestamp\tRunning Processor on $domain...";
 
         opendir(DIR, "$sitemap/$domain")
             or die "Could not open '$sitemap/$domain'\n";
@@ -212,11 +212,11 @@ sub cleanser {
 
     my $timestamp = DateTime->now;
 
-    say "$timestamp\tRunning Cleanser...";
-
     my %CLEANED;
 
     for my $domain (@ARGV) {
+
+        say "$timestamp\tRunning Cleanser on $domain...";
 
         opendir(DIR, "$sitemap/$domain")
             or die "Could not open '$sitemap/$domain'\n";
